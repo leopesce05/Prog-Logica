@@ -30,6 +30,14 @@ unico(X, L) :-
 % repetido(+X,?L) ← El elemento X tiene más de una ocurrencia en la lista L.
 
 % pertenece_veces(+X,+L,?N) ← El elemento X ocurre N veces en la lista L
+pertenece_veces(_, [], 0).
+pertenece_veces(X, [X|R], s(N)) :- pertenece_veces(X, R, N).
+pertenece_veces(X, [Y|R], N) :- X \= Y, pertenece_veces(X, R, N).
+
+%Check si podemos usar IS
+%pertenece_veces(_, [], 0).
+%pertenece_veces(X, [X|R], N) :- pertenece_veces(X, R, N1), N1 is N - 1.
+%pertenece_veces(X, [Y|R], N) :- X \= Y, pertenece_veces(X, R, N).
 
 % pares(+L1,?L2) ← L2 es la lista que contiene los elementos pares de L1.
 
