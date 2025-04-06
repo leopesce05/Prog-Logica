@@ -3,6 +3,9 @@
 % ============================================================================================================ %
 
 % pertenece(?X,?L) ← El elemento X pertenece a la lista L.
+pertenece(X, [X|_]).
+pertenece(X,[_| R]) :- pertenece(X, R).
+
 
 % unico(+X,+L) ← El elemento X tiene una única ocurrencia en la lista L.
 unico(X, L) :- 
