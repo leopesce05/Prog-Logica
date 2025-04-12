@@ -94,6 +94,19 @@ palabra([a,s,a,s]).
 palabra([c,a,s,a]).
 palabra([m,o,r,a]).
 
+% Predicados para ambas soluciones: 
+
+% matrizN(+N,-M) ← M es una matriz de tamaño N X N que en sus celdas contiene variables,
+% de modo que representa un tablero vacío. La matriz está representada como lista de listas.
+% ?- matriz(4,M).
+% M = [[_,_,_,_], [_,_,_,_], [_,_,_,_], [_,_,_,_]]
+
+
+
+% traspuesta(?M,?MT) ← MT es la traspuesta de la matriz M.
+% ?- traspuesta([[A,B],[C,D],MT).
+% MT = [[A,C],[B,D]]
+
 % Parte 2.1:
 
 % Parte 2.2:
