@@ -126,6 +126,36 @@ matrizN(N, [Fila|Resto]) :-
 % ?- traspuesta([[A,B],[C,D],MT).
 % MT = [[A,C],[B,D]]
 
+elemN_Esimo(1,[E|_],E).
+elemN_Esimo(N,[_|F],E):-
+    N>0,
+    NSig is N-1,
+    elemN_Esimo(NSig,F,E).
+
+columnaN_Esima(_, [], []).
+columnaN_Esima(N, [F | M], [X|Col]):-
+    elemN_Esimo(N,F,X),
+    columnaN_Esima(N,M,Col).
+
+trasponer(_, 0, []).  
+trasponer(M, N, [Col|R]) :-
+    N > 0,
+    columnaN_Esima(N, M, Col),  
+    N1 is N - 1, 
+    trasponer(M, N1, R).
+
+tamanio([],0).
+tamanio([_|T], N):-
+    tamanio(T,N1),
+    N is N1+1.
+
+traspuesta([], []).
+traspuesta(M, MT) :-
+    tamanio(M, N), 
+    trasponer(M, N, MT).
+
+  
+
 
 % Parte 2.1:
 
