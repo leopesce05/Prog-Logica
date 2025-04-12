@@ -100,12 +100,32 @@ palabra([m,o,r,a]).
 % de modo que representa un tablero vacío. La matriz está representada como lista de listas.
 % ?- matriz(4,M).
 % M = [[_,_,_,_], [_,_,_,_], [_,_,_,_], [_,_,_,_]]
+crearListaN(1,[_]).
+crearListaN(N,M):-
+    N1 is N-1,
+    append([_],M1, M),
+    crearListaN(N1,M1).
 
+matrizNAux(_,[],0).
+matrizNAux(N, [F|R], Ni):-
+    Ni > 0,
+    Nj is Ni-1,
+    crearListaN(N, F), 
+    matrizNAux(N, R, Nj).  
+
+matrizN(0, []).
+matrizN(N, [Fila|Resto]) :-
+    N > 0,
+    crearListaN(N, Fila),  % Fila nueva en cada paso
+    N1 is N - 1,
+    matrizNAux(N, Resto, N1).  
+   
 
 
 % traspuesta(?M,?MT) ← MT es la traspuesta de la matriz M.
 % ?- traspuesta([[A,B],[C,D],MT).
 % MT = [[A,C],[B,D]]
+
 
 % Parte 2.1:
 
