@@ -65,6 +65,34 @@ pares_impares([X|Resto], Pares, [X|Impares]) :-
 % ============================================================================================================ %
 %                                           2. Palabras cruzadas                                               %
 % ============================================================================================================ %
+palabra([a,l]).
+palabra([l,o]).
+palabra([a,s]).
+palabra([s,i]).
+palabra([l,a]).
+palabra([l,e]).
+palabra([a,s]).
+palabra([s,e]).
+palabra([a,l,a]).
+palabra([c,a,n]).
+palabra([a,s,a]).
+palabra([a,c,a]).
+palabra([a,m,a]).
+palabra([c,a,l]).
+palabra([m,a,l]).
+palabra([m,a,s]).
+palabra([l,a,s]).
+palabra([a,n,a]).
+palabra([m,e,s,a]).
+palabra([o,s,a,s]).
+palabra([r,a,n,a]).
+palabra([a,s,e,s]).
+palabra([m,e,r,a]).
+palabra([e,s,a,s]).
+palabra([s,a,n,e]).
+palabra([a,s,a,s]).
+palabra([c,a,s,a]).
+palabra([m,o,r,a]).
 
 % Parte 2.1:
 
