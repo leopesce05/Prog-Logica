@@ -26,6 +26,10 @@ unico(X, L) :-
 
 % elegir_primero(+X,+L1,?L2) ← La lista L2 contiene los elementos de L1 sin la primera ocurrencia de X, 
 %                              si X pertenece a L2.
+elegir_primero(_,[],[]).
+elegir_primero(X,[X|T],T).
+elegir_primero(X,[Y|T],[Y|L]):-
+        elegir_primero(X,T,L).
 
 % repetido(+X,?L) ← El elemento X tiene más de una ocurrencia en la lista L.
 
@@ -35,6 +39,14 @@ pertenece_veces(X, [X|R], N) :- pertenece_veces(X, R, N1), N1 is N - 1.
 pertenece_veces(X, [Y|R], N) :- X \= Y, pertenece_veces(X, R, N).
 
 % pares(+L1,?L2) ← L2 es la lista que contiene los elementos pares de L1.
+pares([],[]).
+pares([X|T], [X|P]):-
+    0 is X mod 2,
+    pares(T, P).
+pares([X|T], P):-
+    1 is X mod 2,
+    pares(T, P).    
+
 
 % pares_impares(+L1,?L2,?L3) ← L2 es una lista con los valores pares de la lista L1,
 %                              L3 es una lista con los valores impares de la lista L1.
