@@ -31,7 +31,13 @@ elegir_primero(X,[X|T],T).
 elegir_primero(X,[Y|T],[Y|L]):-
         elegir_primero(X,T,L).
 
-% repetido(+X,?L) ← El elemento X tiene más de una ocurrencia en la lista L.
+% repetido(+X,?L) ← El elemento X tiene más de una ocurrencia en la lista L
+repetido(X, [X|R]) :- otra_vez(X, R).
+repetido(X, [Y|R]) :- X \= Y, repetido(X, R).
+
+% otra_vez(+X,?L) <- El elemento X no aparece al menos una vez más en la lista L
+otra_vez(X, [X|_]).
+otra_vez(X, [_|R]) :- otra_vez(X, R).
 
 % pertenece_veces(+X,+L,?N) ← El elemento X ocurre N veces en la lista L
 pertenece_veces(_, [], 0).
