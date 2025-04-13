@@ -149,7 +149,11 @@ trasponer(M, N, MT) :-
     columnaN_Esima(N, M, Col),  
     N1 is N - 1, 
     trasponer(M, N1, R),
-    append(R, [Col], MT).
+    concatenar(R, [Col], MT).
+
+concatenar([],L,L).
+concatenar([H|T],L,[H|R]):-
+    concatenar(T,L,R).
 
 tamanio([],0).
 tamanio([_|T], N):-
