@@ -106,11 +106,11 @@ palabra([m,o,r,a]).
 % de modo que representa un tablero vacío. La matriz está representada como lista de listas.
 % ?- matriz(4,M).
 % M = [[_,_,_,_], [_,_,_,_], [_,_,_,_], [_,_,_,_]]
-crearListaN(1,[_]).
-crearListaN(N,M):-
-    N1 is N-1,
-    append([_],M1, M),
-    crearListaN(N1,M1).
+crearListaN(0, []).
+crearListaN(N, [_|Resto]) :-
+    N > 0,
+    N1 is N - 1,
+    crearListaN(N1, Resto).
 
 matrizNAux(_,[],0).
 matrizNAux(N, [F|R], Ni):-
@@ -169,6 +169,38 @@ traspuesta(M, MT) :-
 
 
 % Parte 2.1:
+
+% Verifica que todas las filas sean palabras válidas
+todas_filas_validas([]).
+todas_filas_validas([F|Resto]) :-
+    palabra(F),
+    todas_filas_validas(Resto).
+
+% Comprueba que P sea una palabra de longitud N
+palabra_longitud_n(P, N) :-
+    palabra(P),
+    tamanio(P, N).
+
+% Asigna palabras de tamaño N a las filas
+asignar_palabras_longitud_n([], _).
+asignar_palabras_longitud_n([F|Resto], N) :-
+    palabra_longitud_n(F, N),
+    asignar_palabras_longitud_n(Resto, N).
+
+
+% cruzadas1(+N,?T) ← T es un tablero válido de tamaño N X N de palabras cruzadas
+% cruzadas1(3,T)
+% T = [[a,l,a],[c,a,l],[a,s,a]]
+
+cruzadas1(N, T) :-
+    matrizN(N, T),
+    
+    asignar_palabras_longitud_n(T, N),
+    
+    traspuesta(T, TT),
+    todas_filas_validas(TT).
+
+
 
 % Parte 2.2:
 
