@@ -144,11 +144,12 @@ columnaN_Esima(N, [F | M], [X|Col]):-
     columnaN_Esima(N,M,Col).
 
 trasponer(_, 0, []).  
-trasponer(M, N, [Col|R]) :-
+trasponer(M, N, MT) :-
     N > 0,
     columnaN_Esima(N, M, Col),  
     N1 is N - 1, 
-    trasponer(M, N1, R).
+    trasponer(M, N1, R),
+    append(R, [Col], MT).
 
 tamanio([],0).
 tamanio([_|T], N):-
