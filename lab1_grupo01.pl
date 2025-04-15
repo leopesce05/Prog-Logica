@@ -8,6 +8,7 @@ pertenece(X,[_| R]) :- pertenece(X, R).
 
 
 % unico(+X,+L) ← El elemento X tiene una única ocurrencia en la lista L.
+
 unico(X, L) :- 
     pertenece(X, L),
     not(repetido(X, L)).
@@ -26,25 +27,30 @@ unico(X, L) :-
 
 % elegir_primero(+X,+L1,?L2) ← La lista L2 contiene los elementos de L1 sin la primera ocurrencia de X, 
 %                              si X pertenece a L2.
+
 elegir_primero(_,[],[]).
 elegir_primero(X,[X|T],T).
 elegir_primero(X,[Y|T],[Y|L]):-
         elegir_primero(X,T,L).
 
 % repetido(+X,?L) ← El elemento X tiene mas de una ocurrencia en la lista L
+
 repetido(X, [X|R]) :- otra_vez(X, R).
 repetido(X, [Y|R]) :- X \= Y, repetido(X, R).
 
 % otra_vez(+X,?L) <- El elemento X no aparece al menos una vez mas en la lista L
+
 otra_vez(X, [X|_]).
 otra_vez(X, [_|R]) :- otra_vez(X, R).
 
 % pertenece_veces(+X,+L,?N) ← El elemento X ocurre N veces en la lista L
+
 pertenece_veces(_, [], 0).
 pertenece_veces(X, [X|R], N) :- pertenece_veces(X, R, N1), N1 is N - 1.
 pertenece_veces(X, [Y|R], N) :- X \= Y, pertenece_veces(X, R, N).
 
 % pares(+L1,?L2) ← L2 es la lista que contiene los elementos pares de L1.
+
 pares([],[]).
 pares([X|T], [X|P]):-
     0 is X mod 2,
@@ -56,6 +62,7 @@ pares([X|T], P):-
 
 % pares_impares(+L1,?L2,?L3) ← L2 es una lista con los valores pares de la lista L1,
 %                              L3 es una lista con los valores impares de la lista L1.
+
 pares_impares([], [], []).
 pares_impares([X|Resto], [X|Pares], Impares) :-
     0 is X mod 2,
@@ -67,12 +74,14 @@ pares_impares([X|Resto], Pares, [X|Impares]) :-
 % ordenada(+L1, ?L2) ← L2 contiene los elementos de L1 ordenados de menor a mayor,
 %                     utilizando el algoritmo de ordenación por selección. Las listas contienen 
 %                     valores enteros y no hay elementos repetidos.
+
 ordenada([], []).
 ordenada(L, [Min|Resto]) :-
     seleccionar_menor(L, Min, R),
     ordenada(R, Resto).
 
 % seleccionar_menor(+L, -Min, -R) ← Min es el menor de L, R es L sin Min
+
 seleccionar_menor([X], X, []).
 seleccionar_menor([X|Xs], X, Xs) :-
     seleccionar_menor(Xs, Y, Resto),
@@ -216,6 +225,14 @@ cruzadas1(N, T) :-
 
 
 % Parte 2.2:
+
+% intercaladas(+M1,+M2,?I) ← I es una lista que contiene las filas de M y MT intercaladas. 
+% M y MT son de igual tamaño. 
+% ?- intercaladas([[1,2,3],[4,5,6],[7,8,9]], [[1,4,7],[2,5,8],[3,6,9]], I). 
+% I = [[1,2,3],[1,4,7],[4,5,6],[2,5,8],[7,8,9],[3,6,9]] 
+
+intercaladas([], [], []).
+
 
 % Parte 2.3:
 
