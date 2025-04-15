@@ -232,6 +232,9 @@ cruzadas1(N, T) :-
 % I = [[1,2,3],[1,4,7],[4,5,6],[2,5,8],[7,8,9],[3,6,9]] 
 
 intercaladas([], [], []).
+intercaladas([H|M1], M2, [H|I]) :-
+    intercaladas(M2, M1, I).
+
 
 
 % Parte 2.3:
