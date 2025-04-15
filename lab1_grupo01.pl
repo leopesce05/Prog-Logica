@@ -232,9 +232,75 @@ cruzadas1(N, T) :-
 % I = [[1,2,3],[1,4,7],[4,5,6],[2,5,8],[7,8,9],[3,6,9]] 
 
 intercaladas([], [], []).
-intercaladas([H|M1], M2, [H|I]) :-
-    intercaladas(M2, M1, I). % Igual a la función concatenar, pero va alternando el término a agregar para agregar uno y uno
+intercaladas([H1|M1], [H2|M2], [H1,H2|I]) :-
+    intercaladas(M1, M2, I).
 
+
+% cruzadas2(+N,?T) ← T es un tablero válido de tamaño N X N de palabras cruzadas, es 
+% decir, todas las filas y todas las columnas contienen letras que forman palabras de largo N 
+% pertenecientes al diccionario. 
+% ?- cruzadas2(3,T). 
+% T = [[a,l,a],[c,a,l],[a,s,a]]
+% Construye una matriz de NxN con palabras válidas, alternando entre filas y columnas
+cruzadas2(N, T) :-
+    % Crear matriz vacía de NxN
+    matrizN(N, T),
+    % Construir la matriz alternando entre filas y columnas
+    construir_matriz(T, N).
+
+% construir_matriz(+T, +N) ← Construye la matriz T de tamaño NxN alternando entre filas y columnas
+construir_matriz([Fila1|Resto], N) :-
+    % Primero construir una fila válida
+    palabra_longitud_n(Fila1, N),
+    % Luego construir una columna válida
+    traspuesta([Fila1|Resto], TT),
+    [Col1|_] = TT,
+    palabra_longitud_n(Col1, N),
+    % Continuar alternando entre filas y columnas
+    construir_resto([Fila1|Resto], TT, 2, N).
+
+% construir_resto(+T, +TT, +Pos, +N) ← Construye el resto de la matriz a partir de la posición Pos
+construir_resto(_, _, Pos, N) :- Pos > N, !.
+construir_resto(T, TT, Pos, N) :-
+    % Si Pos es impar, construir fila
+    1 is Pos mod 2,
+    obtener_elemento(T, Pos, Fila),
+    palabra_longitud_n(Fila, N),
+    % Verificar que la fila sea compatible con las columnas existentes
+    verificar_compatibilidad(T, TT, Pos),
+    % Continuar con la siguiente posición
+    Pos1 is Pos + 1,
+    construir_resto(T, TT, Pos1, N).
+construir_resto(T, TT, Pos, N) :-
+    % Si Pos es par, construir columna
+    0 is Pos mod 2,
+    obtener_elemento(TT, Pos, Col),
+    palabra_longitud_n(Col, N),
+    % Verificar que la columna sea compatible con las filas existentes
+    verificar_compatibilidad(T, TT, Pos),
+    % Continuar con la siguiente posición
+    Pos1 is Pos + 1,
+    construir_resto(T, TT, Pos1, N).
+
+% obtener_elemento(+Lista, +Pos, -Elemento) ← Obtiene el elemento en la posición Pos de la Lista
+obtener_elemento([E|_], 1, E).
+obtener_elemento([_|Resto], Pos, E) :-
+    Pos > 1,
+    Pos1 is Pos - 1,
+    obtener_elemento(Resto, Pos1, E).
+
+% verificar_compatibilidad(+T, +TT, +Pos) ← Verifica que la fila/columna en la posición Pos sea compatible
+verificar_compatibilidad(T, TT, Pos) :-
+    obtener_elemento(T, Pos, Fila),
+    obtener_elemento(TT, Pos, Col),
+    % Verificar que los elementos en la intersección sean iguales
+    verificar_interseccion(Fila, Col, 1).
+
+% verificar_interseccion(+Fila, +Col, +Pos) ← Verifica que los elementos en la intersección sean iguales
+verificar_interseccion([], [], _).
+verificar_interseccion([H|Fila], [H|Col], Pos) :-
+    Pos1 is Pos + 1,
+    verificar_interseccion(Fila, Col, Pos1).
 
 
 % Parte 2.3:
