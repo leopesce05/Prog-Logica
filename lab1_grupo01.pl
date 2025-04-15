@@ -233,7 +233,7 @@ cruzadas1(N, T) :-
 
 intercaladas([], [], []).
 intercaladas([H|M1], M2, [H|I]) :-
-    intercaladas(M2, M1, I).
+    intercaladas(M2, M1, I). % Igual a la función concatenar, pero va alternando el término a agregar para agregar uno y uno
 
 
 
