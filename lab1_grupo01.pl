@@ -80,7 +80,7 @@ ordenada(L, [Min|Resto]) :-
     seleccionar_menor(L, Min, R),
     ordenada(R, Resto).
 
-% seleccionar_menor(+L, -Min, -R) ← Min es el menor de L, R es L sin Min
+% seleccionar_menor(+L, ?Min, ?R) ← Min es el menor de L, R es L sin Min
 
 seleccionar_menor([X], X, []).
 seleccionar_menor([X|Xs], X, Xs) :-
@@ -124,7 +124,7 @@ palabra([m,o,r,a]).
 
 % Predicados para ambas soluciones: 
 
-% matrizN(+N,-M) ← M es una matriz de tamaño N X N que en sus celdas contiene variables,
+% matrizN(+N,?M) ← M es una matriz de tamaño N X N que en sus celdas contiene variables,
 % de modo que representa un tablero vacío. La matriz está representada como lista de listas.
 % ?- matriz(4,M).
 % M = [[_,_,_,_], [_,_,_,_], [_,_,_,_], [_,_,_,_]]
@@ -282,7 +282,7 @@ construir_resto(T, TT, Pos, N) :-
     Pos1 is Pos + 1,
     construir_resto(T, TT, Pos1, N).
 
-% obtener_elemento(+Lista, +Pos, -Elemento) ← Obtiene el elemento en la posición Pos de la Lista
+% obtener_elemento(+Lista, +Pos, ?Elemento) ← Obtiene el elemento en la posición Pos de la Lista
 obtener_elemento([E|_], 1, E).
 obtener_elemento([_|Resto], Pos, E) :-
     Pos > 1,
@@ -305,7 +305,9 @@ verificar_interseccion([H|Fila], [H|Col], Pos) :-
 
 % Parte 2.3:
 
-
+% Comando a ejecutar para comparar eficiencia (Con N = {2, 3, 4, 5, 6}):
+% ?- time(findall(T1, cruzadas1(N, T1), Soluciones1)).
+% ?- time(findall(T2, cruzadas2(N, T2), Soluciones2)).
 
 
 
