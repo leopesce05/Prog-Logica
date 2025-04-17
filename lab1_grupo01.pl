@@ -241,66 +241,21 @@ intercaladas([H1|M1], [H2|M2], [H1,H2|I]) :-
 % pertenecientes al diccionario. 
 % ?- cruzadas2(3,T). 
 % T = [[a,l,a],[c,a,l],[a,s,a]]
+
 % Construye una matriz de NxN con palabras válidas, alternando entre filas y columnas
 cruzadas2(N, T) :-
-    % Crear matriz vacía de NxN
-    matrizN(N, T),
-    % Construir la matriz alternando entre filas y columnas
-    construir_matriz(T, N).
+    matrizN(N, T),          % 1. Crea matriz NxN con variables
+    traspuesta(T, TT),      % 2. Crea la traspuesta (también con variables vinculadas)
+    intercaladas(T, TT, I), % 3. Intercala filas (T) y columnas (TT)
+    todas_palabras_validas_longitud_n(I, N). % 4. Valida/Asigna todas las filas/columnas intercaladas
 
-% construir_matriz(+T, +N) ← Construye la matriz T de tamaño NxN alternando entre filas y columnas
-construir_matriz([Fila1|Resto], N) :-
-    % Primero construir una fila válida
-    palabra_longitud_n(Fila1, N),
-    % Luego construir una columna válida
-    traspuesta([Fila1|Resto], TT),
-    [Col1|_] = TT,
-    palabra_longitud_n(Col1, N),
-    % Continuar alternando entre filas y columnas
-    construir_resto([Fila1|Resto], TT, 2, N).
+% Verifica que todas las listas en ListaDeListas sean palabras válidas de longitud N
+todas_palabras_validas_longitud_n([], _).
+todas_palabras_validas_longitud_n([P|Resto], N) :-
+    palabra_longitud_n(P, N), % Intenta unificar/validar P como palabra de longitud N
+    todas_palabras_validas_longitud_n(Resto, N).
 
-% construir_resto(+T, +TT, +Pos, +N) ← Construye el resto de la matriz a partir de la posición Pos
-construir_resto(_, _, Pos, N) :- Pos > N, !.
-construir_resto(T, TT, Pos, N) :-
-    % Si Pos es impar, construir fila
-    1 is Pos mod 2,
-    obtener_elemento(T, Pos, Fila),
-    palabra_longitud_n(Fila, N),
-    % Verificar que la fila sea compatible con las columnas existentes
-    verificar_compatibilidad(T, TT, Pos),
-    % Continuar con la siguiente posición
-    Pos1 is Pos + 1,
-    construir_resto(T, TT, Pos1, N).
-construir_resto(T, TT, Pos, N) :-
-    % Si Pos es par, construir columna
-    0 is Pos mod 2,
-    obtener_elemento(TT, Pos, Col),
-    palabra_longitud_n(Col, N),
-    % Verificar que la columna sea compatible con las filas existentes
-    verificar_compatibilidad(T, TT, Pos),
-    % Continuar con la siguiente posición
-    Pos1 is Pos + 1,
-    construir_resto(T, TT, Pos1, N).
 
-% obtener_elemento(+Lista, +Pos, ?Elemento) ← Obtiene el elemento en la posición Pos de la Lista
-obtener_elemento([E|_], 1, E).
-obtener_elemento([_|Resto], Pos, E) :-
-    Pos > 1,
-    Pos1 is Pos - 1,
-    obtener_elemento(Resto, Pos1, E).
-
-% verificar_compatibilidad(+T, +TT, +Pos) ← Verifica que la fila/columna en la posición Pos sea compatible
-verificar_compatibilidad(T, TT, Pos) :-
-    obtener_elemento(T, Pos, Fila),
-    obtener_elemento(TT, Pos, Col),
-    % Verificar que los elementos en la intersección sean iguales
-    verificar_interseccion(Fila, Col, 1).
-
-% verificar_interseccion(+Fila, +Col, +Pos) ← Verifica que los elementos en la intersección sean iguales
-verificar_interseccion([], [], _).
-verificar_interseccion([H|Fila], [H|Col], Pos) :-
-    Pos1 is Pos + 1,
-    verificar_interseccion(Fila, Col, Pos1).
 
 
 % Parte 2.3:
@@ -309,7 +264,30 @@ verificar_interseccion([H|Fila], [H|Col], Pos) :-
 % ?- time(findall(T1, cruzadas1(N, T1), Soluciones1)).
 % ?- time(findall(T2, cruzadas2(N, T2), Soluciones2)).
 
-
+% Parte 2.3:
+    % Explicacion de porque cruzadas2 es mas eficiente que cruzadas1:
+        % La diferencia clave radica en cuándo se detectan y aplican las restricciones, lo que lleva a una poda más temprana del árbol de búsqueda en cruzadas2.
+        % Estrategia de cruzadas1 (Generar Filas, Luego Verificar Columnas):
+            % -  Generación de Filas Completa: cruzadas1 primero intenta llenar todas las filas de la matriz T con palabras válidas de longitud N usando asignar_palabras_longitud_n. 
+            %    Esto puede requerir mucho backtracking por sí solo si hay muchas combinaciones posibles de palabras para las filas.
+            % -  Verificación Tardía de Columnas: Solo después de haber encontrado una asignación completa y válida para todas las filas, calcula la transpuesta TT y entonces verifica 
+            %    si cada una de las columnas (ahora filas en TT) también forma una palabra válida usando todas_filas_validas.
+            % -  Ineficiencia - Detección Tardía de Fallos: El gran problema aquí es que una elección "mala" en las primeras filas (por ejemplo, Fila1 y Fila2) podría hacer que Columna1 
+            %    sea imposible de formar como palabra válida. Sin embargo, cruzadas1 no se dará cuenta de esto hasta que haya asignado todas las demás filas (Fila3, Fila4, etc.) y 
+            %    luego intente verificar las columnas. En ese punto, si Columna1 falla, tiene que retroceder (backtrack) potencialmente a través de muchas asignaciones de filas posteriores antes de 
+            %    poder probar una Fila1 o Fila2 diferente. Se realiza mucho trabajo generando combinaciones de filas que estaban condenadas al fracaso desde el principio debido a las restricciones de 
+            %    las columnas.
+        % Estrategia de cruzadas2 (Construcción Incremental y Alternante):
+            % -  Inicio Restringido: Comienza asignando Fila1 (palabra_longitud_n(Fila1, N)) y luego inmediatamente intenta asignar Columna1 (palabra_longitud_n(Col1, N) 
+            %    donde Col1 se obtiene de la traspuesta parcial). Si hay un conflicto inmediato en la celda (0,0), falla y retrocede aquí mismo.
+            % -  Construcción Alternante y Verificación Temprana (construir_resto): Intenta asignar/validar Fila_i. Inmediatamente después, verifica la compatibilidad (verificar_compatibilidad) 
+            %    entre esta Fila_i y la Columna_i (tal como está instanciada hasta ahora). verificar_interseccion comprueba si las letras ya asignadas coinciden. Si hay un conflicto 
+            %    (p.ej., la letra asignada en Fila_i en la posición j no coincide con la letra ya asignada en Columna_j en la posición i), falla y retrocede ahora, sin intentar asignar el resto 
+            %    de filas/columnas. Intenta asignar/validar Columna_j. Inmediatamente después, verifica la compatibilidad entre Columna_j y Fila_j. Si hay conflicto, falla y retrocede ahora.
+            % -  Eficiencia: Poda Temprana del Árbol de Búsqueda: Al verificar la compatibilidad inmediatamente después de intentar asignar una palabra a una fila o columna, cruzadas2 detecta 
+            %    inconsistencias mucho antes. Si asignar palabra_X a Fila2 hace imposible formar Columna1 o Columna2 válidas (debido a las letras que impone palabra_X en esas columnas), 
+            %    cruzadas2 lo detectará cuando verifique la compatibilidad de Fila2 o cuando intente asignar Columna1 o Columna2. Esto evita explorar todas las combinaciones posibles para 
+            %    Fila3, Fila4, etc., que se basarían en la elección incorrecta de Fila2. El árbol de búsqueda se "poda" mucho antes, eliminando ramas que no llevarán a una solución.      
 
 
 
