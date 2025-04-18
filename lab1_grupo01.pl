@@ -93,34 +93,6 @@ seleccionar_menor([X|Xs], Y, [X|Resto]) :-
 % ============================================================================================================ %
 %                                           2. Palabras cruzadas                                               %
 % ============================================================================================================ %
-palabra([a,l]).
-palabra([l,o]).
-palabra([a,s]).
-palabra([s,i]).
-palabra([l,a]).
-palabra([l,e]).
-palabra([a,s]).
-palabra([s,e]).
-palabra([a,l,a]).
-palabra([c,a,n]).
-palabra([a,s,a]).
-palabra([a,c,a]).
-palabra([a,m,a]).
-palabra([c,a,l]).
-palabra([m,a,l]).
-palabra([m,a,s]).
-palabra([l,a,s]).
-palabra([a,n,a]).
-palabra([m,e,s,a]).
-palabra([o,s,a,s]).
-palabra([r,a,n,a]).
-palabra([a,s,e,s]).
-palabra([m,e,r,a]).
-palabra([e,s,a,s]).
-palabra([s,a,n,e]).
-palabra([a,s,a,s]).
-palabra([c,a,s,a]).
-palabra([m,o,r,a]).
 
 % Predicados para ambas soluciones: 
 
@@ -289,6 +261,30 @@ todas_palabras_validas_longitud_n([P|Resto], N) :-
             %    cruzadas2 lo detectará cuando verifique la compatibilidad de Fila2 o cuando intente asignar Columna1 o Columna2. Esto evita explorar todas las combinaciones posibles para 
             %    Fila3, Fila4, etc., que se basarían en la elección incorrecta de Fila2. El árbol de búsqueda se "poda" mucho antes, eliminando ramas que no llevarán a una solución.      
 
+
+% medir_cruzadas1(+N) - Mide el tiempo para encontrar todas las soluciones con cruzadas1
+medir_cruzadas1(N) :-
+    format('Midiendo cruzadas1 para N = ~w:~n', [N]),
+    time(findall(T, cruzadas1(N, T), Soluciones)).
+
+% medir_cruzadas2(+N) - Mide el tiempo para encontrar todas las soluciones con cruzadas2
+medir_cruzadas2(N) :-
+    format('Midiendo cruzadas2 para N = ~w:~n', [N]),
+    time(findall(T, cruzadas2(N, T), Soluciones)).
+
+% comparar(+N) - Compara ambas implementaciones para un valor de N
+comparar(N) :-
+    format('~n===== Comparacion para N = ~w =====~n', [N]),
+    medir_cruzadas2(N),
+    medir_cruzadas1(N).
+
+% comparar_todos - Compara para N = 2, 3, 4, 5, 6
+comparar_todos :-
+    comparar(2),
+    comparar(3),
+    comparar(4),
+    comparar(5),
+    comparar(6).
 
 
 
