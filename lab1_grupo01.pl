@@ -2,6 +2,7 @@
 %                                           1. Predicados varios                                               %
 % ============================================================================================================ %
 
+
 % pertenece(?X,?L) ← El elemento X pertenece a la lista L.
 pertenece(X, [X|_]).
 pertenece(X,[_| R]) :- pertenece(X, R).
@@ -126,28 +127,16 @@ matrizN(N, [Fila|Resto]) :-
 % ?- traspuesta([[A,B],[C,D],MT).
 % MT = [[A,C],[B,D]]
 
-elemN_Esimo(1,[E|_],E).
-elemN_Esimo(N,[_|F],E):-
-    N>0,
-    NSig is N-1,
-    elemN_Esimo(NSig,F,E).
-
-columnaN_Esima(_, [], []).
-columnaN_Esima(N, [F | M], [X|Col]):-
-    elemN_Esimo(N,F,X),
-    columnaN_Esima(N,M,Col).
+columnaN_Esima([], [], []).
+columnaN_Esima([[N|F] | M], [N|Col], [F|MSig]):-
+    columnaN_Esima(M,Col,MSig).
 
 trasponer(_, 0, []).  
-trasponer(M, N, MT) :-
+trasponer(M, N, [Col|MT]) :-
     N > 0,
-    columnaN_Esima(N, M, Col),  
+    columnaN_Esima(M, Col, MSig),  
     N1 is N - 1, 
-    trasponer(M, N1, R),
-    concatenar(R, [Col], MT).
-
-concatenar([],L,L).
-concatenar([H|T],L,[H|R]):-
-    concatenar(T,L,R).
+    trasponer(MSig, N1, MT).
 
 tamanio([],0).
 tamanio([_|T], N):-
@@ -159,7 +148,6 @@ traspuesta(M, MT) :-
     tamanio(M, N), 
     trasponer(M, N, MT).
 
-  
 
 
 % Parte 2.1:
@@ -188,13 +176,9 @@ asignar_palabras_longitud_n([F|Resto], N) :-
 
 cruzadas1(N, T) :-
     matrizN(N, T),
-    
     asignar_palabras_longitud_n(T, N),
-    
     traspuesta(T, TT),
     todas_filas_validas(TT).
-
-
 
 % Parte 2.2:
 
@@ -223,8 +207,9 @@ cruzadas2(N, T) :-
 
 % Verifica que todas las listas en ListaDeListas sean palabras válidas de longitud N
 todas_palabras_validas_longitud_n([], _).
-todas_palabras_validas_longitud_n([P|Resto], N) :-
-    palabra_longitud_n(P, N), % Intenta unificar/validar P como palabra de longitud N
+todas_palabras_validas_longitud_n([P1,P2|Resto], N) :-
+    palabra_longitud_n(P1, N), % Intenta unificar/validar P como palabra de longitud N
+    palabra_longitud_n(P2, N),
     todas_palabras_validas_longitud_n(Resto, N).
 
 
