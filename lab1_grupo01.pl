@@ -160,8 +160,8 @@ todas_filas_validas([F|Resto]) :-
 
 % Comprueba que P sea una palabra de longitud N
 palabra_longitud_n(P, N) :-
-    palabra(P),
-    tamanio(P, N).
+    tamanio(P, N),
+    palabra(P).
 
 % Asigna palabras de tamaño N a las filas
 asignar_palabras_longitud_n([], _).
@@ -176,8 +176,8 @@ asignar_palabras_longitud_n([F|Resto], N) :-
 
 cruzadas1(N, T) :-
     matrizN(N, T),
-    asignar_palabras_longitud_n(T, N),
     traspuesta(T, TT),
+    asignar_palabras_longitud_n(T, N),
     todas_filas_validas(TT).
 
 % Parte 2.2:
