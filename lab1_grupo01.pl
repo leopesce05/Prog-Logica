@@ -1,7 +1,4 @@
-% ============================================================================================================ %
-%                                           1. Predicados varios                                               %
-% ============================================================================================================ %
-
+% 1. Predicados varios
 
 % pertenece(?X,?L) ← El elemento X pertenece a la lista L.
 pertenece(X, [X|_]).
@@ -9,49 +6,38 @@ pertenece(X,[_| R]) :- pertenece(X, R).
 
 
 % unico(+X,+L) ← El elemento X tiene una única ocurrencia en la lista L.
+unico(X, L) :- contar_ocurrencias(X, L, 1).
 
-unico(X, L) :- 
-    pertenece(X, L),
-    not(repetido(X, L)).
+%contar_ocurrencias(?X, ?L, +N). Predicado auxiliar para contar ocurrencias
+contar_ocurrencias(_, [], 0).
+contar_ocurrencias(X, [X|Resto], N) :-
+    contar_ocurrencias(X, Resto, N1),
+    N is N1 + 1.
+contar_ocurrencias(X, [Y|Resto], N) :-
+    X \= Y,
+    contar_ocurrencias(X, Resto, N).
 
-    % Forma alternativa:
-        % unico(X, L) :- contar_ocurrencias(X, L, 1).
 
-    % Predicado auxiliar para contar ocurrencias
-        % contar_ocurrencias(_, [], 0).
-        % contar_ocurrencias(X, [X|Resto], N) :-
-        %     contar_ocurrencias(X, Resto, N1),
-        %     N is N1 + 1.
-        % contar_ocurrencias(X, [Y|Resto], N) :-
-        %     X \= Y,
-        %     contar_ocurrencias(X, Resto, N).
-
-% elegir_primero(+X,+L1,?L2) ← La lista L2 contiene los elementos de L1 sin la primera ocurrencia de X, 
-%                              si X pertenece a L2.
-
+% elegir_primero(+X,+L1,?L2) ← La lista L2 contiene los elementos de L1 sin la primera ocurrencia de X, si X pertenece a L2.
 elegir_primero(_,[],[]).
 elegir_primero(X,[X|T],T).
 elegir_primero(X,[Y|T],[Y|L]):-
         elegir_primero(X,T,L).
 
 % repetido(+X,?L) ← El elemento X tiene mas de una ocurrencia en la lista L
-
 repetido(X, [X|R]) :- otra_vez(X, R).
 repetido(X, [Y|R]) :- X \= Y, repetido(X, R).
 
 % otra_vez(+X,?L) <- El elemento X no aparece al menos una vez mas en la lista L
-
 otra_vez(X, [X|_]).
 otra_vez(X, [_|R]) :- otra_vez(X, R).
 
 % pertenece_veces(+X,+L,?N) ← El elemento X ocurre N veces en la lista L
-
 pertenece_veces(_, [], 0).
 pertenece_veces(X, [X|R], N) :- pertenece_veces(X, R, N1), N1 is N - 1.
 pertenece_veces(X, [Y|R], N) :- X \= Y, pertenece_veces(X, R, N).
 
 % pares(+L1,?L2) ← L2 es la lista que contiene los elementos pares de L1.
-
 pares([],[]).
 pares([X|T], [X|P]):-
     0 is X mod 2,
@@ -61,9 +47,7 @@ pares([X|T], P):-
     pares(T, P).    
 
 
-% pares_impares(+L1,?L2,?L3) ← L2 es una lista con los valores pares de la lista L1,
-%                              L3 es una lista con los valores impares de la lista L1.
-
+% pares_impares(+L1,?L2,?L3) ← L2 es una lista con los valores pares de la lista L1, L3 es una lista con los valores impares de la lista L1.
 pares_impares([], [], []).
 pares_impares([X|Resto], [X|Pares], Impares) :-
     0 is X mod 2,
@@ -75,38 +59,37 @@ pares_impares([X|Resto], Pares, [X|Impares]) :-
 % ordenada(+L1, ?L2) ← L2 contiene los elementos de L1 ordenados de menor a mayor,
 %                     utilizando el algoritmo de ordenación por selección. Las listas contienen 
 %                     valores enteros y no hay elementos repetidos.
-
 ordenada([], []).
 ordenada(L, [Min|Resto]) :-
     seleccionar_menor(L, Min, R),
     ordenada(R, Resto).
 
 % seleccionar_menor(+L, ?Min, ?R) ← Min es el menor de L, R es L sin Min
-
 seleccionar_menor([X], X, []).
 seleccionar_menor([X|Xs], X, Xs) :-
-    seleccionar_menor(Xs, Y, Resto),
+    seleccionar_menor(Xs, Y, _),
     X =< Y.
 seleccionar_menor([X|Xs], Y, [X|Resto]) :-
     seleccionar_menor(Xs, Y, Resto),
     X > Y.
 
-% ============================================================================================================ %
-%                                           2. Palabras cruzadas                                               %
-% ============================================================================================================ %
+
+
+
+
+% 2. Palabras cruzadas                                               
 
 % Predicados para ambas soluciones: 
 
-% matrizN(+N,?M) ← M es una matriz de tamaño N X N que en sus celdas contiene variables,
-% de modo que representa un tablero vacío. La matriz está representada como lista de listas.
-% ?- matriz(4,M).
-% M = [[_,_,_,_], [_,_,_,_], [_,_,_,_], [_,_,_,_]]
+
+% crearListaN(+N, ?L) <- Crea una lista vacía de tamaño NxN: [_,_,_,...]
 crearListaN(0, []).
 crearListaN(N, [_|Resto]) :-
     N > 0,
     N1 is N - 1,
     crearListaN(N1, Resto).
 
+% matrizNAux(+N,-M,+J) <- Crea la fila J de la matriz M de tamaño NxN y la agrega a la matriz
 matrizNAux(_,[],0).
 matrizNAux(N, [F|R], Ni):-
     Ni > 0,
@@ -114,23 +97,25 @@ matrizNAux(N, [F|R], Ni):-
     crearListaN(N, F), 
     matrizNAux(N, R, Nj).  
 
+
+% matrizN(+N,-M) ← M es una matriz de tamaño N X N que en sus celdas contiene variables,
+% de modo que representa un tablero vacío. La matriz está representada como lista de listas.
+% ?- matriz(4,M).
+% M = [[_,_,_,_], [_,_,_,_], [_,_,_,_], [_,_,_,_]]
 matrizN(0, []).
 matrizN(N, [Fila|Resto]) :-
     N > 0,
-    crearListaN(N, Fila),  % Fila nueva en cada paso
+    crearListaN(N, Fila),
     N1 is N - 1,
-    matrizNAux(N, Resto, N1).  
-   
+    matrizNAux(N, Resto, N1).
 
 
-% traspuesta(?M,?MT) ← MT es la traspuesta de la matriz M.
-% ?- traspuesta([[A,B],[C,D],MT).
-% MT = [[A,C],[B,D]]
-
+% columnaN_Esima(+M, -Col, -MRestoColumnas) <- Extrae la primera columna de una matriz y devuelve el resto de la matriz sin esa columna.
 columnaN_Esima([], [], []).
 columnaN_Esima([[N|F] | M], [N|Col], [F|MSig]):-
-    columnaN_Esima(M,Col,MSig).
+    columnaN_Esima(M, Col, MSig).
 
+% trasponer(+M, +N, -MT) <- Traspone una matriz y la devuelve en MT.
 trasponer(_, 0, []).  
 trasponer(M, N, [Col|MT]) :-
     N > 0,
@@ -138,11 +123,15 @@ trasponer(M, N, [Col|MT]) :-
     N1 is N - 1, 
     trasponer(MSig, N1, MT).
 
+% tamanio(+L, -N) <- Calcula el tamaño (número de elementos) de una lista L.
 tamanio([],0).
 tamanio([_|T], N):-
     tamanio(T,N1),
     N is N1+1.
 
+% traspuesta(?M,?MT) ← MT es la traspuesta de la matriz M.
+% ?- traspuesta([[A,B],[C,D]],MT).
+% MT = [[A,C],[B,D]]
 traspuesta([], []).
 traspuesta(M, MT) :-
     tamanio(M, N), 
@@ -152,18 +141,18 @@ traspuesta(M, MT) :-
 
 % Parte 2.1:
 
-% Verifica que todas las filas sean palabras válidas
+% todas_filas_validas(+L) <- Verifica que todas las filas sean palabras válidas
 todas_filas_validas([]).
 todas_filas_validas([F|Resto]) :-
     palabra(F),
     todas_filas_validas(Resto).
 
-% Comprueba que P sea una palabra de longitud N
+% palabra_longitud_n(+P, +N) <-Comprueba que P sea una palabra de longitud N
 palabra_longitud_n(P, N) :-
     tamanio(P, N),
     palabra(P).
 
-% Asigna palabras de tamaño N a las filas
+% asignar_palabras_longitud_n(+M,+N) <- Asigna palabras de tamaño N a las filas de la matriz M
 asignar_palabras_longitud_n([], _).
 asignar_palabras_longitud_n([F|Resto], N) :-
     palabra_longitud_n(F, N),
@@ -173,7 +162,6 @@ asignar_palabras_longitud_n([F|Resto], N) :-
 % cruzadas1(+N,?T) ← T es un tablero válido de tamaño N X N de palabras cruzadas
 % cruzadas1(3,T)
 % T = [[a,l,a],[c,a,l],[a,s,a]]
-
 cruzadas1(N, T) :-
     matrizN(N, T),
     traspuesta(T, TT),
@@ -200,15 +188,15 @@ intercaladas([H1|M1], [H2|M2], [H1,H2|I]) :-
 
 % Construye una matriz de NxN con palabras válidas, alternando entre filas y columnas
 cruzadas2(N, T) :-
-    matrizN(N, T),          % 1. Crea matriz NxN con variables
-    traspuesta(T, TT),      % 2. Crea la traspuesta (también con variables vinculadas)
-    intercaladas(T, TT, I), % 3. Intercala filas (T) y columnas (TT)
-    todas_palabras_validas_longitud_n(I, N). % 4. Valida/Asigna todas las filas/columnas intercaladas
+    matrizN(N, T),         
+    traspuesta(T, TT),      
+    intercaladas(T, TT, I),
+    todas_palabras_validas_longitud_n(I, N). 
 
 % Verifica que todas las listas en ListaDeListas sean palabras válidas de longitud N
 todas_palabras_validas_longitud_n([], _).
 todas_palabras_validas_longitud_n([P1,P2|Resto], N) :-
-    palabra_longitud_n(P1, N), % Intenta unificar/validar P como palabra de longitud N
+    palabra_longitud_n(P1, N),
     palabra_longitud_n(P2, N),
     todas_palabras_validas_longitud_n(Resto, N).
 
@@ -218,8 +206,8 @@ todas_palabras_validas_longitud_n([P1,P2|Resto], N) :-
 % Parte 2.3:
 
 % Comando a ejecutar para comparar eficiencia (Con N = {2, 3, 4, 5, 6}):
-% ?- time(findall(T1, cruzadas1(N, T1), Soluciones1)).
-% ?- time(findall(T2, cruzadas2(N, T2), Soluciones2)).
+% ?- time(cruzadas1(N, T1)).
+% ?- time(T2, cruzadas2(N, T2)).
 
 % Parte 2.3:
     % Explicacion de porque cruzadas2 es mas eficiente que cruzadas1:
@@ -245,31 +233,15 @@ todas_palabras_validas_longitud_n([P1,P2|Resto], N) :-
             %    inconsistencias mucho antes. Si asignar palabra_X a Fila2 hace imposible formar Columna1 o Columna2 válidas (debido a las letras que impone palabra_X en esas columnas), 
             %    cruzadas2 lo detectará cuando verifique la compatibilidad de Fila2 o cuando intente asignar Columna1 o Columna2. Esto evita explorar todas las combinaciones posibles para 
             %    Fila3, Fila4, etc., que se basarían en la elección incorrecta de Fila2. El árbol de búsqueda se "poda" mucho antes, eliminando ramas que no llevarán a una solución.      
-
-
-% medir_cruzadas1(+N) - Mide el tiempo para encontrar todas las soluciones con cruzadas1
-medir_cruzadas1(N) :-
-    format('Midiendo cruzadas1 para N = ~w:~n', [N]),
-    time(findall(T, cruzadas1(N, T), Soluciones)).
-
-% medir_cruzadas2(+N) - Mide el tiempo para encontrar todas las soluciones con cruzadas2
-medir_cruzadas2(N) :-
-    format('Midiendo cruzadas2 para N = ~w:~n', [N]),
-    time(findall(T, cruzadas2(N, T), Soluciones)).
+            
 
 % comparar(+N) - Compara ambas implementaciones para un valor de N
 comparar(N) :-
-    format('~n===== Comparacion para N = ~w =====~n', [N]),
-    medir_cruzadas2(N),
-    medir_cruzadas1(N).
-
-% comparar_todos - Compara para N = 2, 3, 4, 5, 6
-comparar_todos :-
-    comparar(2),
-    comparar(3),
-    comparar(4),
-    comparar(5),
-    comparar(6).
-
+    format('Comparacion para N = ~w \n', [N]),
+    format('Cruzadas 1'),
+    time(cruzadas1(N, T)),
+    format('Cruzadas 2'),
+    time(cruzadas2(N, T)).
+  
 
 
