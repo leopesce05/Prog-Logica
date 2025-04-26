@@ -1,3 +1,11 @@
+% Grupo 01 - Lab 1 - Prolog
+% Integrantes:
+% - Diego Pisa, 5.510.635-2
+% - Gonzalo Apkarian, 5.494.604-2
+% - Leonardo Pesce, 5.471.535-2
+% - Mauricio Morales, 5.278.642-4
+
+
 % 1. Predicados varios
 
 % pertenece(?X,?L) ← El elemento X pertenece a la lista L.
@@ -34,7 +42,7 @@ otra_vez(X, [_|R]) :- otra_vez(X, R).
 
 % pertenece_veces(+X,+L,?N) ← El elemento X ocurre N veces en la lista L
 pertenece_veces(_, [], 0).
-pertenece_veces(X, [X|R], N) :- pertenece_veces(X, R, N1), N1 is N - 1.
+pertenece_veces(X, [X|R], N) :- pertenece_veces(X, R, N1), N is N1 + 1.
 pertenece_veces(X, [Y|R], N) :- X \= Y, pertenece_veces(X, R, N).
 
 % pares(+L1,?L2) ← L2 es la lista que contiene los elementos pares de L1.
@@ -208,6 +216,29 @@ todas_palabras_validas_longitud_n([P1,P2|Resto], N) :-
 % Comando a ejecutar para comparar eficiencia (Con N = {2, 3, 4, 5, 6}):
 % ?- time(cruzadas1(N, T1)).
 % ?- time(T2, cruzadas2(N, T2)).
+
+% Tabla de resultados cruzadas1
+% +-------------------------------------------+
+% |   N   |    Inferencias    | Tiempo (seg)  |
+% +-------------------------------------------+
+% |   2   |        100        |     0.024     |
+% |   3   |        64.072     |     18.230    |
+% |   4   |        ???        |     ???       |
+% |   5   |        ???        |     ???       |
+% |   6   |        ???        |     ???       |
+% +-------------------------------------------+
+
+% Tabla de resultados cruzadas2
+% +-------------------------------------------+
+% |   N   |    Inferencias    | Tiempo (seg)  |
+% +-------------------------------------------+
+% |   2   |        64         |     0.002     |
+% |   3   |        115        |     0.001     |
+% |   4   |        180        |     0.000     |
+% |   5   |        12.562     |     0.697     |
+% |   6   |        26.126.129 |     996.772   |
+% +-------------------------------------------+
+
 
 % Parte 2.3:
     % Explicacion de porque cruzadas2 es mas eficiente que cruzadas1:
