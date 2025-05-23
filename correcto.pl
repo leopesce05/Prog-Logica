@@ -28,13 +28,56 @@ fin_del_juego(Tablero, P1, P2, Ganador) :-
 
 % Predicado auxiliar para contar puntos
 contar_puntos(Tablero, P1, P2) :-
-    contar_celdas(Tablero, 1, P1),
-    contar_celdas(Tablero, 2, P2).
+    contar_celdas_completadas(Tablero, 1, P1),
+    contar_celdas_completadas(Tablero, 2, P2).
 
-% Predicado para contar celdas de un jugador
-contar_celdas(Tablero, Jugador, Total) :-
-    findall(1, (member(Fila, Tablero), member(Jugador, Fila)), Lista),
-    length(Lista, Total).
+% Predicado para contar celdas completadas de un jugador
+contar_celdas_completadas(Tablero, Jugador, Total) :-
+    findall([F,C], 
+            (celda_completada(Tablero, F, C),
+             celda_pertenece_jugador(Tablero, F, C, Jugador)), 
+            Celdas),
+    length(Celdas, Total).
+
+% Predicado para verificar si una celda pertenece a un jugador
+celda_pertenece_jugador(Tablero, F, C, Jugador) :-
+    F1 is F - 1,
+    C1 is C - 1,
+    obtener_linea(Tablero, F1, C1, 1, L1),
+    obtener_linea(Tablero, F1, C1+1, 2, L2),
+    obtener_linea(Tablero, F1+1, C1, 3, L3),
+    obtener_linea(Tablero, F1+1, C1+1, 4, L4),
+    L1 = Jugador, L2 = Jugador, L3 = Jugador, L4 = Jugador.
+
+% Predicado para verificar si una celda está completa
+celda_completada(Tablero, F, C) :-
+    F1 is F - 1,
+    C1 is C - 1,
+    celda_valida(Tablero, F1, C1),
+    celda_rodeada(Tablero, F1, C1).
+
+% Predicado para verificar si una celda es válida
+celda_valida(Tablero, F, C) :-
+    length(Tablero, Filas),
+    nth1(1, Tablero, PrimeraFila),
+    length(PrimeraFila, Columnas),
+    F > 0, F < Filas,
+    C > 0, C < Columnas.
+
+% Predicado para verificar si una celda está rodeada
+celda_rodeada(Tablero, F, C) :-
+    F1 is F + 1,
+    C1 is C + 1,
+    obtener_linea(Tablero, F, C, 1, L1),
+    obtener_linea(Tablero, F, C1, 2, L2),
+    obtener_linea(Tablero, F1, C, 3, L3),
+    obtener_linea(Tablero, F1, C1, 4, L4),
+    L1 \= 0, L2 \= 0, L3 \= 0, L4 \= 0.
+
+% Predicado para obtener una línea
+obtener_linea(Tablero, F, C, D, Valor) :-
+    nth1(F, Tablero, Fila),
+    nth1(C, Fila, Valor).
 
 % Predicado para realizar una jugada humana
 jugada_humano(Tablero, Turno, F, C, D, Tablero2, Turno2, Celdas) :-
@@ -73,28 +116,6 @@ marcar_linea(Tablero, F, C, D, Turno) :-
 % Predicado para verificar celdas completadas
 verificar_celdas(Tablero, F, C, D, Celdas) :-
     findall([F2,C2], celda_completada(Tablero, F2, C2), Celdas).
-
-% Predicado para verificar si una celda está completa
-celda_completada(Tablero, F, C) :-
-    F1 is F - 1,
-    C1 is C - 1,
-    celda_valida(Tablero, F1, C1),
-    celda_rodeada(Tablero, F1, C1).
-
-% Predicado para verificar si una celda está rodeada
-celda_rodeada(Tablero, F, C) :-
-    F1 is F + 1,
-    C1 is C + 1,
-    obtener_linea(Tablero, F, C, 1, L1),
-    obtener_linea(Tablero, F, C1, 2, L2),
-    obtener_linea(Tablero, F1, C, 3, L3),
-    obtener_linea(Tablero, F1, C1, 4, L4),
-    L1 \= 0, L2 \= 0, L3 \= 0, L4 \= 0.
-
-% Predicado para obtener una línea
-obtener_linea(Tablero, F, C, D, Valor) :-
-    nth1(F, Tablero, Fila),
-    nth1(C, Fila, Valor).
 
 % Predicado para jugada de la máquina usando minimax
 jugada_maquina(Tablero, Turno, Nivel, F, C, D, Tablero2, Turno2, Celdas) :-
