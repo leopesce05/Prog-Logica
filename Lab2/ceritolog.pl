@@ -45,7 +45,7 @@ tablero(N, Tablero) :-
 
 % fila_vacia(+N, -Fila)
 fila_vacia(0, []).
-fila_vacia(N, [c(n, n, 0) | Resto]) :-
+fila_vacia(N, [c(0, 0, 0) | Resto]) :-
     N > 0,
     N1 is N - 1,
     fila_vacia(N1, Resto).
