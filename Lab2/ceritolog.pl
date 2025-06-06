@@ -36,6 +36,9 @@ sugerencia_jugada/6 % sugerencia_jugada(+Tablero,+Turno,+Nivel,?F,?C,?D)
 % a un jugador humano.
 ]).
 
+% ======================================================================================================= %
+% ======================================================================================================= %
+
 % tablero(+N, -Tablero)
 tablero(N, Tablero) :-
     N > 1,
@@ -56,3 +59,54 @@ construir_tablero(N, Fila, [Fila | Resto]) :-
     N > 0,
     N1 is N - 1,
     construir_tablero(N1, Fila, Resto).
+
+% ======================================================================================================= %
+% ======================================================================================================= %
+
+% fin_del_juego(+Tablero, ?P1, ?P2, ?Ganador)
+fin_del_juego(Tablero, P1, P2, Ganador) :-
+    todas_lineas_marcadas(Tablero),
+    contar_puntos(Tablero, P1, P2),
+    determinar_ganador(P1, P2, Ganador).
+
+% todas_lineas_marcadas(+Tablero)
+todas_lineas_marcadas(Tablero) :-
+    forall(member(Fila, Tablero),
+           forall(member(c(_, _, Propietario), Fila),
+                  Propietario \== 0)).
+
+% contar_puntos(+Tablero, -P1, -P2)
+contar_puntos(Tablero, P1, P2) :-
+    contar_puntos_aux(Tablero, 0, 0, P1, P2).
+
+% contar_puntos_aux(+Tablero, +Acc1, +Acc2, -P1, -P2)
+contar_puntos_aux([], P1, P2, P1, P2).
+contar_puntos_aux([Fila|Resto], Acc1, Acc2, P1, P2) :-
+    contar_puntos_fila(Fila, 0, 0, P1Fila, P2Fila),
+    NuevoAcc1 is Acc1 + P1Fila,
+    NuevoAcc2 is Acc2 + P2Fila,
+    contar_puntos_aux(Resto, NuevoAcc1, NuevoAcc2, P1, P2).
+
+% contar_puntos_fila(+Fila, +Acc1, +Acc2, -P1, -P2)
+contar_puntos_fila([], P1, P2, P1, P2).
+contar_puntos_fila([c(_, _, 1)|Resto], Acc1, Acc2, P1, P2) :-
+    NuevoAcc1 is Acc1 + 1,
+    contar_puntos_fila(Resto, NuevoAcc1, Acc2, P1, P2).
+contar_puntos_fila([c(_, _, 2)|Resto], Acc1, Acc2, P1, P2) :-
+    NuevoAcc2 is Acc2 + 1,
+    contar_puntos_fila(Resto, Acc1, NuevoAcc2, P1, P2).
+contar_puntos_fila([c(_, _, 0)|Resto], Acc1, Acc2, P1, P2) :-
+    contar_puntos_fila(Resto, Acc1, Acc2, P1, P2).
+
+% determinar_ganador(+P1, +P2, -Ganador)
+determinar_ganador(P1, P2, "Gana el jugador 1") :-
+    P1 > P2, !.
+determinar_ganador(P1, P2, "Gana el jugador 2") :-
+    P2 > P1, !.
+determinar_ganador(P1, P2, "Empate") :-
+    P1 =:= P2.
+
+
+% ======================================================================================================= %
+% ======================================================================================================= %
+
