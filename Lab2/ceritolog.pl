@@ -42,9 +42,8 @@ sugerencia_jugada/6 % sugerencia_jugada(+Tablero,+Turno,+Nivel,?F,?C,?D)
 % tablero(+N, -Tablero)
 tablero(N, Tablero) :-
     N > 1,
-    N1 is N - 1,
-    fila_vacia(N1, Fila),
-    construir_tablero(N1, Fila, Tablero).
+    fila_vacia(N, Fila),
+    construir_tablero(N, Fila, Tablero).
 
 % fila_vacia(+N, -Fila)
 fila_vacia(0, []).
@@ -121,16 +120,16 @@ jugada_humano(Tablero, Turno, F, C, D, Tablero2, Turno2, Celdas) :-
 % Verifica que la jugada sea válida (la línea no esté ya marcada)
 jugada_valida(Tablero, F, C, h) :-
     length(Tablero, N),
-    F >= 1, F =< N,
-    C >= 1, C =< N-1,
+    F >= 1, F =< N, % No se puede marcar la linea de fuera
+    C >= 1, C =< N-1, % No se puede marcar la linea de fuera
     nth1(F, Tablero, Fila),
     nth1(C, Fila, c(H, _, _)),
     H =:= 0.
 
 jugada_valida(Tablero, F, C, v) :-
     length(Tablero, N),
-    F >= 1, F =< N-1,
-    C >= 1, C =< N,
+    F >= 1, F =< N-1, % No se puede marcar la linea de fuera
+    C >= 1, C =< N, % No se puede marcar la linea de fuera
     nth1(F, Tablero, Fila),
     nth1(C, Fila, c(_, V, _)),
     V =:= 0.
