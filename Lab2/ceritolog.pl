@@ -70,9 +70,27 @@ fin_del_juego(Tablero, P1, P2, Ganador) :-
 
 % todas_lineas_marcadas(+Tablero)
 todas_lineas_marcadas(Tablero) :-
-    forall(member(Fila, Tablero),
-           forall(member(c(_, _, Propietario), Fila),
-                  Propietario \== 0)).
+    length(Tablero, N),
+    N1 is N - 1,
+    % Verificar celdas internas
+    forall(between(1, N1, F),
+           forall(between(1, N1, C),
+                  (nth1(F, Tablero, Fila),
+                   nth1(C, Fila, c(H, V, _)),
+                   H =:= 1,
+                   V =:= 1))),
+    % Verificar última fila (H=1, V=0)
+    forall(between(1, N1, C),
+           (nth1(N, Tablero, Fila),
+            nth1(C, Fila, c(H, V, _)),
+            H =:= 1,
+            V =:= 0)),
+    % Verificar última columna (H=0, V=1)
+    forall(between(1, N1, F),
+           (nth1(F, Tablero, Fila),
+            nth1(N, Fila, c(H, V, _)),
+            H =:= 0,
+            V =:= 1)).
 
 % contar_puntos(+Tablero, -P1, -P2)
 contar_puntos(Tablero, P1, P2) :-
