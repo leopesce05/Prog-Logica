@@ -1,0 +1,87 @@
+\documentclass[12pt]{article} % Default font size is 12pt, it can be changed here
+
+\usepackage[spanish]{babel} % Configura el idioma del documento a español
+
+\usepackage[a4paper, margin=1in]{geometry}
+
+\usepackage{graphicx} % Required for including pictures
+
+\usepackage{url}
+
+\usepackage{float} % Allows putting an [H] in \begin{figure} to specify the exact location of the figure
+\usepackage{wrapfig} % Allows in-line images such as the example fish picture
+
+\linespread{1.2} % Line spacing
+
+%\setlength\parindent{0pt} % Uncomment to remove all indentation from paragraphs
+
+\graphicspath{{./imagenes/}} % Specifies the directory where pictures are stored
+
+%para escribir en español
+\usepackage[utf8x]{inputenc}
+
+\usepackage{amsmath}
+\usepackage{multirow}
+\usepackage{longtable} % Para tablas que pueden ocupar más de una página
+\usepackage{array} % Para opciones avanzadas de tablas
+\usepackage{booktabs} % Para mejorar la calidad visual de las tablas
+\usepackage{listings}
+\usepackage{fancyvrb}
+\DefineVerbatimEnvironment{Verbatim}{Verbatim}
+{breaklines=true} % Activa el ajuste automático de líneas
+\usepackage{caption}
+
+%opening
+
+\begin{document}
+	\begin{titlepage}
+		\newcommand{\HRule}{\rule{\linewidth}{0.5mm}} % Defines a new command for the horizontal lines, change thickness here
+		
+		\center % Center everything on the page
+		
+		\textsc{\LARGE Programación Lógica}\\[1.5cm] % Name of your university/college
+		\textsc{\Large Curso 2025}\\[0.5cm] % Major heading such as course name
+		\textsc{\large Grupo 01}\\[0.5cm] % Minor heading such as course title
+		
+		\HRule \\[0.4cm]
+		{\huge \bfseries Informe - Laboratorio 2}\\[0.4cm] % Title of your document
+		\HRule \\[1cm]
+		
+		\begin{minipage}{0.4\textwidth}
+			\begin{flushleft} \large
+				\emph{Autores:}\\
+				\textsc{Gonzalo Apkarian Alonso \\ 5.494.604-2}\\ % Your name
+				\textsc{Diego Pisa Sánchez \\ 5.510.635-2}\\ % Your name
+				\textsc{Leonardo Pesce López \\ 5.471.535-2}\\
+				\textsc{Mauricio Morales Gonzalez \\ 5.278.642-4}
+			\end{flushleft}
+		\end{minipage}
+		~
+		\begin{minipage}{0.4\textwidth}
+			\begin{flushright} \large
+				\emph{Profesores:} \\ 
+				Luis \textsc{Chiruzzo} \\ 
+				Aiala \textsc{Rosá} \\ 
+				Juan Pablo \textsc{Conde}
+			\end{flushright}
+		\end{minipage}\\[3cm]
+		
+		% Logo
+		\begin{figure}[H]
+			\centering
+			\includegraphics[width=0.2\textwidth]{logo.png} % Ajusta el tamaño aquí (0.2\textwidth es un ejemplo)
+			\label{fig:logo}
+		\end{figure}
+		
+		% Fecha
+		{\large \today}\\[1cm] % Puedes cambiar \today por una fecha específica si lo prefieres
+		
+		\vfill % Esto asegura que el contenido se distribuya adecuadamente en la página
+		
+	\end{titlepage}
+	
+	\section{Módulos}
+	
+	Para este laboratorio no se usaron módulos extra, se implementaron todos los predicados en el mismo archivo principal. Esta decisión se tomó debido a que se tornó una complicación decidir como modularizar de manera eficiente el programa y no se contaba con mucho tiempo
+	
+\end{document}
