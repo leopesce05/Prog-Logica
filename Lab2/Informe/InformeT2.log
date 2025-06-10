@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.25 (MiKTeX 24.1) (preloaded format=pdflatex 2024.9.13)  9 JUN 2025 20:29
+This is pdfTeX, Version 3.141592653-2.6-1.40.25 (MiKTeX 24.1) (preloaded format=pdflatex 2024.9.13)  9 JUN 2025 22:08
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -849,30 +849,43 @@ File: epstopdf-sys.cfg 2021/03/18 v2.0 Configuration of epstopdf for MiKTeX
 \c@lstlisting=\count311
 Package caption Info: Begin \AtBeginDocument code.
 Package caption Info: End \AtBeginDocument code.
-<./imagenes/logo.png, id=1, 174.6525pt x 223.83624pt>
-File: ./imagenes/logo.png Graphic file (type png)
-<use ./imagenes/logo.png>
-Package pdftex.def Info: ./imagenes/logo.png  used on input line 72.
+<./Imagenes/logo.png, id=1, 174.6525pt x 223.83624pt>
+File: ./Imagenes/logo.png Graphic file (type png)
+<use ./Imagenes/logo.png>
+Package pdftex.def Info: ./Imagenes/logo.png  used on input line 72.
 (pdftex.def)             Requested size: 90.5922pt x 116.1052pt.
  [1
 
-{C:/Users/apkar/AppData/Local/MiKTeX/fonts/map/pdftex/pdftex.map} <./imagenes/l
+{C:/Users/apkar/AppData/Local/MiKTeX/fonts/map/pdftex/pdftex.map} <./Imagenes/l
 ogo.png>]
 Underfull \hbox (badness 10000) in paragraph at lines 92--93
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 101--102
+Underfull \hbox (badness 10000) in paragraph at lines 95--96
 
  []
+
+<./Imagenes/disTablero.png, id=12, 248.127pt x 242.1045pt>
+File: ./Imagenes/disTablero.png Graphic file (type png)
+<use ./Imagenes/disTablero.png>
+Package pdftex.def Info: ./Imagenes/disTablero.png  used on input line 101.
+(pdftex.def)             Requested size: 317.07614pt x 309.37921pt.
+
+LaTeX Warning: `!h' float specifier changed to `!ht'.
 
 [1]
-Underfull \hbox (badness 10000) in paragraph at lines 104--105
+Underfull \hbox (badness 10000) in paragraph at lines 110--111
 
  []
 
-[2] (InformeT2.aux
+
+Underfull \hbox (badness 10000) in paragraph at lines 113--114
+
+ []
+
+[2 <./Imagenes/disTablero.png>] [3] [4] (InformeT2.aux
 LaTeX Info: Redefining \. on input line 8.
 LaTeX Info: Redefining \% on input line 8.
 )
@@ -882,13 +895,13 @@ L3 programming layer <2024-01-04>
  ***********
  ) 
 Here is how much of TeX's memory you used:
- 7736 strings out of 474486
- 127791 string characters out of 5743755
- 1933542 words of memory out of 5000000
- 29942 multiletter control sequences out of 15000+600000
+ 7755 strings out of 474486
+ 128250 string characters out of 5743755
+ 1934542 words of memory out of 5000000
+ 29961 multiletter control sequences out of 15000+600000
  565501 words of font info for 61 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 57i,6n,65p,717b,365s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 57i,6n,65p,925b,365s stack positions out of 10000i,1000n,20000p,200000b,200000s
 <C:/Users/apkar/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/
 cmbx12.pfb><C:/Users/apkar/AppData/Local/Programs/MiKTeX/fonts/type1/public/ams
 fonts/cm/cmcsc10.pfb><C:/Users/apkar/AppData/Local/Programs/MiKTeX/fonts/type1/
@@ -896,9 +909,9 @@ public/amsfonts/cm/cmmi12.pfb><C:/Users/apkar/AppData/Local/Programs/MiKTeX/fon
 ts/type1/public/amsfonts/cm/cmr12.pfb><C:/Users/apkar/AppData/Local/Programs/Mi
 KTeX/fonts/type1/public/amsfonts/cm/cmsy10.pfb><C:/Users/apkar/AppData/Local/Pr
 ograms/MiKTeX/fonts/type1/public/amsfonts/cm/cmti12.pfb>
-Output written on InformeT2.pdf (3 pages, 88191 bytes).
+Output written on InformeT2.pdf (5 pages, 172034 bytes).
 PDF statistics:
- 45 PDF objects out of 1000 (max. 8388607)
+ 53 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)
- 6 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 11 words of extra memory for PDF output out of 10000 (max. 10000000)
 
