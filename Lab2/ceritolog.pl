@@ -141,16 +141,14 @@ jugada_valida(Tablero, F, C, h) :-
     F >= 1, F =< N, % No se puede marcar la linea de fuera
     C >= 1, C =< N-1, % No se puede marcar la linea de fuera
     nth1(F, Tablero, Fila),
-    nth1(C, Fila, c(H, _, _)),
-    H =:= 0.
+    nth1(C, Fila, c(0, _, _)).
 
 jugada_valida(Tablero, F, C, v) :-
     length(Tablero, N),
     F >= 1, F =< N-1, % No se puede marcar la linea de fuera
     C >= 1, C =< N, % No se puede marcar la linea de fuera
     nth1(F, Tablero, Fila),
-    nth1(C, Fila, c(_, V, _)),
-    V =:= 0.
+    nth1(C, Fila, c(_, 0, _)).
 
 % marcar_linea(+Tablero, +F, +C, +D, -TableroNuevo)
 % Marca una línea en el tablero
