@@ -183,37 +183,39 @@ replace_nth1(N, [H|T], Element, [H|NewT]) :-
 % verificar_capturas(+TableroConLinea, +F, +C, +D, +Turno, -Tablero2, -Celdas)
 % Verifica qué celdas se capturaron y las asigna al jugador
 verificar_capturas(TableroConLinea, F, C, D, Turno, Tablero2, Celdas) :-
-    celdas_afectadas(F, C, D, CeldasPosibles),
+    length(TableroConLinea, N),
+    celdas_afectadas(F, C, D, N, CeldasPosibles),
     verificar_celdas_capturadas(TableroConLinea, CeldasPosibles, Turno, Tablero2, Celdas).
 
-% celdas_afectadas(+F, +C, +D, -CeldasPosibles)
+% celdas_afectadas(+F, +C, +D, +N, -CeldasPosibles)
 % Determina qué celdas podrían haberse capturado con esta línea
-celdas_afectadas(F, C, h, CeldasPosibles) :-
+% N es el tamaño del tablero (matriz NxN con celdas (N-1)x(N-1))
+celdas_afectadas(F, C, h, N, CeldasPosibles) :-
     % Una línea horizontal F-C-h puede afectar:
     % - La celda (F-1, C) si F > 1 (celda de arriba)
     % - La celda (F, C) si F <= N-1 (celda de abajo)
     F1 is F - 1,
     findall([Fila, C], 
-            (member(Fila, [F1, F]), Fila >= 1), 
-            CeldasTemp),
-    % Filtrar celdas válidas (dentro del rango capturable)
-    include(celda_capturable, CeldasTemp, CeldasPosibles).
+            (member(Fila, [F1, F]), 
+             celda_capturable([Fila, C], N)), 
+            CeldasPosibles).
 
-celdas_afectadas(F, C, v, CeldasPosibles) :-
+celdas_afectadas(F, C, v, N, CeldasPosibles) :-
     % Una línea vertical F-C-v puede afectar:
     % - La celda (F, C-1) si C > 1 (celda de la izquierda)
     % - La celda (F, C) si C <= N-1 (celda de la derecha)
     C1 is C - 1,
     findall([F, Col], 
-            (member(Col, [C1, C]), Col >= 1), 
-            CeldasTemp),
-    % Filtrar celdas válidas (dentro del rango capturable)
-    include(celda_capturable, CeldasTemp, CeldasPosibles).
+            (member(Col, [C1, C]), 
+             celda_capturable([F, Col], N)), 
+            CeldasPosibles).
 
-% celda_capturable(+[F,C])
-% Verifica si una celda está en el rango capturable (no es borde)
-celda_capturable([F, C]) :-
-    F >= 1, C >= 1.
+% celda_capturable(+[F,C], +N)
+% Verifica si una celda está en el rango capturable (1 <= F,C <= N-1)
+% donde N es el tamaño del tablero
+celda_capturable([F, C], N) :-
+    F >= 1, F =< N-1,
+    C >= 1, C =< N-1.
 
 % verificar_celdas_capturadas(+Tablero, +CeldasPosibles, +Turno, -TableroFinal, -CeldasCapturadas)
 verificar_celdas_capturadas(Tablero, [], _, Tablero, []).
@@ -267,3 +269,116 @@ determinar_siguiente_turno(Turno, [_|_], Turno).
 
 % jugada_maquina(+Tablero,+Turno,+Nivel,?F,?C,?D,?Tablero2,?Turno2,?Celdas)
 jugada_maquina(Tablero, Turno, Nivel, F, C, D, Tablero2, Turno2, Celdas) :-
+    minimax(Tablero, Turno, Nivel, _, F, C, D),
+    jugada_humano(Tablero, Turno, F, C, D, Tablero2, Turno2, Celdas).
+
+% sugerencia_jugada(+Tablero,+Turno,+Nivel,?F,?C,?D)
+sugerencia_jugada(Tablero, Turno, Nivel, F, C, D) :-
+    minimax(Tablero, Turno, Nivel, _, F, C, D).
+
+% minimax(+Tablero, +Jugador, +Profundidad, -Valor, -MejorF, -MejorC, -MejorD)
+minimax(Tablero, Jugador, Profundidad, Valor, MejorF, MejorC, MejorD) :-
+    (fin_del_juego(Tablero, P1, P2, _) ->
+        (Jugador = 1 -> Valor is P1 - P2 ; Valor is P2 - P1),
+        MejorF = -1, MejorC = -1, MejorD = h
+    ; Profundidad =< 0 ->
+        evaluar_tablero(Tablero, Jugador, Valor),
+        MejorF = -1, MejorC = -1, MejorD = h
+    ;
+        movimientos_posibles(Tablero, Movimientos),
+        (Movimientos = [] ->
+            evaluar_tablero(Tablero, Jugador, Valor),
+            MejorF = -1, MejorC = -1, MejorD = h
+        ;
+            evaluar_movimientos(Tablero, Jugador, Profundidad, Movimientos, 
+                              Valor, MejorF, MejorC, MejorD)
+        )
+    ).
+
+% movimientos_posibles(+Tablero, -Movimientos)
+movimientos_posibles(Tablero, Movimientos) :-
+    length(Tablero, N),
+    findall([F,C,D], 
+            (between(1, N, F), between(1, N, C), member(D, [h,v]),
+             jugada_valida(Tablero, F, C, D)), 
+            Movimientos).
+
+% evaluar_movimientos(+Tablero, +Jugador, +Profundidad, +Movimientos, -MejorValor, -MejorF, -MejorC, -MejorD)
+evaluar_movimientos(Tablero, Jugador, Profundidad, [[F,C,D]], MejorValor, F, C, D) :-
+    !,
+    simular_movimiento(Tablero, Jugador, F, C, D, NuevoTablero, SiguienteJugador),
+    Profundidad1 is Profundidad - 1,
+    minimax(NuevoTablero, SiguienteJugador, Profundidad1, ValorOponente, _, _, _),
+    % Si el siguiente jugador es diferente, negamos el valor (minimax)
+    (SiguienteJugador = Jugador ->
+        MejorValor = ValorOponente
+    ;
+        MejorValor is -ValorOponente
+    ).
+
+evaluar_movimientos(Tablero, Jugador, Profundidad, [[F,C,D]|RestoMovimientos], MejorValor, MejorF, MejorC, MejorD) :-
+    simular_movimiento(Tablero, Jugador, F, C, D, NuevoTablero, SiguienteJugador),
+    Profundidad1 is Profundidad - 1,
+    minimax(NuevoTablero, SiguienteJugador, Profundidad1, ValorOponente, _, _, _),
+    % Si el siguiente jugador es diferente, negamos el valor (minimax)
+    (SiguienteJugador = Jugador ->
+        ValorActual = ValorOponente
+    ;
+        ValorActual is -ValorOponente
+    ),
+    evaluar_movimientos(Tablero, Jugador, Profundidad, RestoMovimientos, ValorResto, FR, CR, DR),
+    (ValorActual > ValorResto ->
+        MejorValor = ValorActual, MejorF = F, MejorC = C, MejorD = D
+    ;
+        MejorValor = ValorResto, MejorF = FR, MejorC = CR, MejorD = DR
+    ).
+
+% simular_movimiento(+Tablero, +Jugador, +F, +C, +D, -NuevoTablero, -SiguienteJugador)
+simular_movimiento(Tablero, Jugador, F, C, D, NuevoTablero, SiguienteJugador) :-
+    jugada_humano(Tablero, Jugador, F, C, D, NuevoTablero, SiguienteJugador, _).
+
+% evaluar_tablero(+Tablero, +Jugador, -Valor)
+% Función de evaluación heurística
+evaluar_tablero(Tablero, Jugador, Valor) :-
+    contar_puntos(Tablero, P1, P2),
+    contar_casilleros_casi_completos(Tablero, Jugador, CasiCompletos),
+    OtroJugador is 3 - Jugador,
+    contar_casilleros_casi_completos(Tablero, OtroJugador, CasiOpuesto),
+    (Jugador = 1 ->
+        Valor is (P1 - P2) * 10 + CasiCompletos - CasiOpuesto
+    ;
+        Valor is (P2 - P1) * 10 + CasiCompletos - CasiOpuesto
+    ).
+
+% contar_casilleros_casi_completos(+Tablero, +Jugador, -Cantidad)
+contar_casilleros_casi_completos(Tablero, Jugador, Cantidad) :-
+    length(Tablero, N),
+    N1 is N - 1,
+    findall(1, (between(1, N1, F), between(1, N1, C),
+                casillero_casi_completo(Tablero, F, C)), Lista),
+    length(Lista, Cantidad).
+
+% casillero_casi_completo(+Tablero, +F, +C)
+% Un casillero está casi completo si tiene 3 de sus 4 líneas marcadas
+casillero_casi_completo(Tablero, F, C) :-
+    obtener_celda(Tablero, F, C, c(H1, V1, 0)), % No capturado
+    F1 is F + 1,
+    C1 is C + 1,
+    obtener_celda(Tablero, F1, C, c(H2, _, _)),
+    obtener_celda(Tablero, F, C1, c(_, V2, _)),
+    Lineas = [H1, V1, H2, V2],
+    contar_ocurrencias(Lineas, 1, 3).
+
+% obtener_celda(+Tablero, +F, +C, -Celda)
+obtener_celda(Tablero, F, C, Celda) :-
+    nth1(F, Tablero, Fila),
+    nth1(C, Fila, Celda).
+
+% contar_ocurrencias(+Lista, +Elemento, -Cantidad)
+contar_ocurrencias([], _, 0).
+contar_ocurrencias([X|Resto], X, N) :-
+    contar_ocurrencias(Resto, X, N1),
+    N is N1 + 1.
+contar_ocurrencias([Y|Resto], X, N) :-
+    X \= Y,
+    contar_ocurrencias(Resto, X, N).
