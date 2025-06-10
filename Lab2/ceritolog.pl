@@ -267,118 +267,206 @@ determinar_siguiente_turno(Turno, [_|_], Turno).
 % ======================================================================================================= %
 % ======================================================================================================= %
 
-% jugada_maquina(+Tablero,+Turno,+Nivel,?F,?C,?D,?Tablero2,?Turno2,?Celdas)
-jugada_maquina(Tablero, Turno, Nivel, F, C, D, Tablero2, Turno2, Celdas) :-
-    minimax(Tablero, Turno, Nivel, _, F, C, D),
-    jugada_humano(Tablero, Turno, F, C, D, Tablero2, Turno2, Celdas).
+% % jugada_maquina(+Tablero,+Turno,+Nivel,?F,?C,?D,?Tablero2,?Turno2,?Celdas)
+% jugada_maquina(Tablero, Turno, Nivel, F, C, D, Tablero2, Turno2, Celdas) :-
+%     minimax(Tablero, Turno, Nivel, _, F, C, D),
+%     jugada_humano(Tablero, Turno, F, C, D, Tablero2, Turno2, Celdas).
 
-% sugerencia_jugada(+Tablero,+Turno,+Nivel,?F,?C,?D)
-sugerencia_jugada(Tablero, Turno, Nivel, F, C, D) :-
-    minimax(Tablero, Turno, Nivel, _, F, C, D).
+% % sugerencia_jugada(+Tablero,+Turno,+Nivel,?F,?C,?D)
+% sugerencia_jugada(Tablero, Turno, Nivel, F, C, D) :-
+%     minimax(Tablero, Turno, Nivel, _, F, C, D).
 
-% minimax(+Tablero, +Jugador, +Profundidad, -Valor, -MejorF, -MejorC, -MejorD)
-minimax(Tablero, Jugador, Profundidad, Valor, MejorF, MejorC, MejorD) :-
-    (fin_del_juego(Tablero, P1, P2, _) ->
-        (Jugador = 1 -> Valor is P1 - P2 ; Valor is P2 - P1),
-        MejorF = -1, MejorC = -1, MejorD = h
-    ; Profundidad =< 0 ->
-        evaluar_tablero(Tablero, Jugador, Valor),
-        MejorF = -1, MejorC = -1, MejorD = h
-    ;
-        movimientos_posibles(Tablero, Movimientos),
-        (Movimientos = [] ->
-            evaluar_tablero(Tablero, Jugador, Valor),
-            MejorF = -1, MejorC = -1, MejorD = h
-        ;
-            evaluar_movimientos(Tablero, Jugador, Profundidad, Movimientos, 
-                              Valor, MejorF, MejorC, MejorD)
-        )
-    ).
+% % minimax(+Tablero, +Jugador, +Profundidad, -Valor, -MejorF, -MejorC, -MejorD)
+% minimax(Tablero, Jugador, Profundidad, Valor, MejorF, MejorC, MejorD) :-
+%     (fin_del_juego(Tablero, P1, P2, _) ->
+%         (Jugador = 1 -> Valor is P1 - P2 ; Valor is P2 - P1),
+%         MejorF = -1, MejorC = -1, MejorD = h
+%     ; Profundidad =< 0 ->
+%         evaluar_tablero(Tablero, Jugador, Valor),
+%         MejorF = -1, MejorC = -1, MejorD = h
+%     ;
+%         movimientos_posibles(Tablero, Movimientos),
+%         (Movimientos = [] ->
+%             evaluar_tablero(Tablero, Jugador, Valor),
+%             MejorF = -1, MejorC = -1, MejorD = h
+%         ;
+%             evaluar_movimientos(Tablero, Jugador, Profundidad, Movimientos, 
+%                               Valor, MejorF, MejorC, MejorD)
+%         )
+%     ).
 
-% movimientos_posibles(+Tablero, -Movimientos)
-movimientos_posibles(Tablero, Movimientos) :-
+% % movimientos_posibles(+Tablero, -Movimientos)
+% movimientos_posibles(Tablero, Movimientos) :-
+%     length(Tablero, N),
+%     findall([F,C,D], 
+%             (between(1, N, F), between(1, N, C), member(D, [h,v]),
+%              jugada_valida(Tablero, F, C, D)), 
+%             Movimientos).
+
+% % evaluar_movimientos(+Tablero, +Jugador, +Profundidad, +Movimientos, -MejorValor, -MejorF, -MejorC, -MejorD)
+% evaluar_movimientos(Tablero, Jugador, Profundidad, [[F,C,D]], MejorValor, F, C, D) :-
+%     !,
+%     simular_movimiento(Tablero, Jugador, F, C, D, NuevoTablero, SiguienteJugador),
+%     Profundidad1 is Profundidad - 1,
+%     minimax(NuevoTablero, SiguienteJugador, Profundidad1, ValorOponente, _, _, _),
+%     % Si el siguiente jugador es diferente, negamos el valor (minimax)
+%     (SiguienteJugador = Jugador ->
+%         MejorValor = ValorOponente
+%     ;
+%         MejorValor is -ValorOponente
+%     ).
+
+% evaluar_movimientos(Tablero, Jugador, Profundidad, [[F,C,D]|RestoMovimientos], MejorValor, MejorF, MejorC, MejorD) :-
+%     simular_movimiento(Tablero, Jugador, F, C, D, NuevoTablero, SiguienteJugador),
+%     Profundidad1 is Profundidad - 1,
+%     minimax(NuevoTablero, SiguienteJugador, Profundidad1, ValorOponente, _, _, _),
+%     % Si el siguiente jugador es diferente, negamos el valor (minimax)
+%     (SiguienteJugador = Jugador ->
+%         ValorActual = ValorOponente
+%     ;
+%         ValorActual is -ValorOponente
+%     ),
+%     evaluar_movimientos(Tablero, Jugador, Profundidad, RestoMovimientos, ValorResto, FR, CR, DR),
+%     (ValorActual > ValorResto ->
+%         MejorValor = ValorActual, MejorF = F, MejorC = C, MejorD = D
+%     ;
+%         MejorValor = ValorResto, MejorF = FR, MejorC = CR, MejorD = DR
+%     ).
+
+% % simular_movimiento(+Tablero, +Jugador, +F, +C, +D, -NuevoTablero, -SiguienteJugador)
+% simular_movimiento(Tablero, Jugador, F, C, D, NuevoTablero, SiguienteJugador) :-
+%     jugada_humano(Tablero, Jugador, F, C, D, NuevoTablero, SiguienteJugador, _).
+
+% % evaluar_tablero(+Tablero, +Jugador, -Valor)
+% % Función de evaluación heurística
+% evaluar_tablero(Tablero, Jugador, Valor) :-
+%     contar_puntos(Tablero, P1, P2),
+%     contar_casilleros_casi_completos(Tablero, Jugador, CasiCompletos),
+%     OtroJugador is 3 - Jugador,
+%     contar_casilleros_casi_completos(Tablero, OtroJugador, CasiOpuesto),
+%     (Jugador = 1 ->
+%         Valor is (P1 - P2) * 10 + CasiCompletos - CasiOpuesto
+%     ;
+%         Valor is (P2 - P1) * 10 + CasiCompletos - CasiOpuesto
+%     ).
+
+% % contar_casilleros_casi_completos(+Tablero, +Jugador, -Cantidad)
+% contar_casilleros_casi_completos(Tablero, Jugador, Cantidad) :-
+%     length(Tablero, N),
+%     N1 is N - 1,
+%     findall(1, (between(1, N1, F), between(1, N1, C),
+%                 casillero_casi_completo(Tablero, F, C)), Lista),
+%     length(Lista, Cantidad).
+
+% % casillero_casi_completo(+Tablero, +F, +C)
+% % Un casillero está casi completo si tiene 3 de sus 4 líneas marcadas
+% casillero_casi_completo(Tablero, F, C) :-
+%     obtener_celda(Tablero, F, C, c(H1, V1, 0)), % No capturado
+%     F1 is F + 1,
+%     C1 is C + 1,
+%     obtener_celda(Tablero, F1, C, c(H2, _, _)),
+%     obtener_celda(Tablero, F, C1, c(_, V2, _)),
+%     Lineas = [H1, V1, H2, V2],
+%     contar_ocurrencias(Lineas, 1, 3).
+
+% % obtener_celda(+Tablero, +F, +C, -Celda)
+% obtener_celda(Tablero, F, C, Celda) :-
+%     nth1(F, Tablero, Fila),
+%     nth1(C, Fila, Celda).
+
+% % contar_ocurrencias(+Lista, +Elemento, -Cantidad)
+% contar_ocurrencias([], _, 0).
+% contar_ocurrencias([X|Resto], X, N) :-
+%     contar_ocurrencias(Resto, X, N1),
+%     N is N1 + 1.
+% contar_ocurrencias([Y|Resto], X, N) :-
+%     X \= Y,
+%     contar_ocurrencias(Resto, X, N).
+
+
+
+% ======================================================================================================= %
+% ======================================================================================================= %
+
+
+ % jugada_maquina(+Tablero,+Turno,+Nivel,?F,?C,?D,?Tablero2,?Turno2,?Celdas)
+ jugada_maquina(Tablero, Turno, Nivel, F, C, D, Tablero2, Turno2, Celdas) :-
+     sugerencia_jugada(Tablero, Turno, Nivel, F, C, D),
+     jugada_humano(Tablero, Turno, F, C, D, Tablero2, Turno2, Celdas).
+
+ % sugerencia_jugada(+Tablero,+Turno,+Nivel,?F,?C,?D)
+ sugerencia_jugada(Tablero, Turno, Nivel, F, C, D) :-
+     length(Tablero, N),
+     N1 is N - 1,
+
+     findall([F1, C1, D1], (
+         member(D1, [h, v]),
+         between(0, N1, F1),
+         between(0, N1, C1),
+         jugada_valida(Tablero, F1, C1, D1)
+     ), Jugadas),
+     evaluar_jugadas(Jugadas, Tablero, Turno, Nivel, [], [MejorF, MejorC, MejorD]),
+     F = MejorF, C = MejorC, D = MejorD.
+
+% evaluar_jugadas(+Jugadas,+Tablero,+Turno,+Nivel,+MejorHastaAhora,?MejorJugada)
+evaluar_jugadas([], _, _, _, [Jugada, _], Jugada).
+evaluar_jugadas([[F,C,D]|Resto], Tablero, Turno, Nivel, MejorActual, MejorJugada) :-
+    jugada_humano(Tablero, Turno, F, C, D, Tab1, Turno1, _),
+    N1 is Nivel - 1,
+    valor_minimax(Tab1, Turno1, N1, Valor),
+    mejor_entre([[F,C,D], Valor], MejorActual, NuevoMejor),
+    evaluar_jugadas(Resto, Tablero, Turno, Nivel, NuevoMejor, MejorJugada).
+
+% valor_minimax(+Tablero,+Turno,+Nivel,?Valor)
+valor_minimax(Tablero, Turno, 0, Valor) :-
+    puntaje(Tablero, Turno, MiPuntaje),
+    otro_turno(Turno, Otro),
+    puntaje(Tablero, Otro, PuntajeOponente),
+    Valor is MiPuntaje - PuntajeOponente.
+
+valor_minimax(Tablero, Turno, Nivel, Valor) :-
+    Nivel > 0,
+    N1 is Nivel - 1,
     length(Tablero, N),
-    findall([F,C,D], 
-            (between(1, N, F), between(1, N, C), member(D, [h,v]),
-             jugada_valida(Tablero, F, C, D)), 
-            Movimientos).
+    N2 is N - 1,
 
-% evaluar_movimientos(+Tablero, +Jugador, +Profundidad, +Movimientos, -MejorValor, -MejorF, -MejorC, -MejorD)
-evaluar_movimientos(Tablero, Jugador, Profundidad, [[F,C,D]], MejorValor, F, C, D) :-
-    !,
-    simular_movimiento(Tablero, Jugador, F, C, D, NuevoTablero, SiguienteJugador),
-    Profundidad1 is Profundidad - 1,
-    minimax(NuevoTablero, SiguienteJugador, Profundidad1, ValorOponente, _, _, _),
-    % Si el siguiente jugador es diferente, negamos el valor (minimax)
-    (SiguienteJugador = Jugador ->
-        MejorValor = ValorOponente
-    ;
-        MejorValor is -ValorOponente
-    ).
+    findall(V, (
+        member(D, [h, v]),
+        between(0, N2, F),
+        between(0, N2, C),
+        jugada_valida(Tablero, F, C, D),
+        jugada_humano(Tablero, Turno, F, C, D, Tab1, Turno1, Celdas),
+        (Celdas \= [] -> valor_minimax(Tab1, Turno, N1, V) ; 
+                         otro_turno(Turno, Turno1),
+                         valor_minimax(Tab1, Turno1, N1, V))
+    ), Valores),
+    (Valores == [] -> 
+        puntaje(Tablero, Turno, MiPuntaje),
+        otro_turno(Turno, Otro),
+        puntaje(Tablero, Otro, PuntajeOponente),
+        Valor is MiPuntaje - PuntajeOponente
+    ; mejor_valor(Turno, Valores, Valor)).
 
-evaluar_movimientos(Tablero, Jugador, Profundidad, [[F,C,D]|RestoMovimientos], MejorValor, MejorF, MejorC, MejorD) :-
-    simular_movimiento(Tablero, Jugador, F, C, D, NuevoTablero, SiguienteJugador),
-    Profundidad1 is Profundidad - 1,
-    minimax(NuevoTablero, SiguienteJugador, Profundidad1, ValorOponente, _, _, _),
-    % Si el siguiente jugador es diferente, negamos el valor (minimax)
-    (SiguienteJugador = Jugador ->
-        ValorActual = ValorOponente
-    ;
-        ValorActual is -ValorOponente
-    ),
-    evaluar_movimientos(Tablero, Jugador, Profundidad, RestoMovimientos, ValorResto, FR, CR, DR),
-    (ValorActual > ValorResto ->
-        MejorValor = ValorActual, MejorF = F, MejorC = C, MejorD = D
-    ;
-        MejorValor = ValorResto, MejorF = FR, MejorC = CR, MejorD = DR
-    ).
+% otro_turno(+TurnoActual, -TurnoSiguiente)
+otro_turno(1, 2).
+otro_turno(2, 1).
 
-% simular_movimiento(+Tablero, +Jugador, +F, +C, +D, -NuevoTablero, -SiguienteJugador)
-simular_movimiento(Tablero, Jugador, F, C, D, NuevoTablero, SiguienteJugador) :-
-    jugada_humano(Tablero, Jugador, F, C, D, NuevoTablero, SiguienteJugador, _).
+% puntaje(+Tablero, +Turno, -Puntos)
+puntaje(Tablero, Turno, Puntos) :-
+    flatten(Tablero, Lista),
+    include(es_casilla_del(Turno), Lista, Casillas),
+    length(Casillas, Puntos).
 
-% evaluar_tablero(+Tablero, +Jugador, -Valor)
-% Función de evaluación heurística
-evaluar_tablero(Tablero, Jugador, Valor) :-
-    contar_puntos(Tablero, P1, P2),
-    contar_casilleros_casi_completos(Tablero, Jugador, CasiCompletos),
-    OtroJugador is 3 - Jugador,
-    contar_casilleros_casi_completos(Tablero, OtroJugador, CasiOpuesto),
-    (Jugador = 1 ->
-        Valor is (P1 - P2) * 10 + CasiCompletos - CasiOpuesto
-    ;
-        Valor is (P2 - P1) * 10 + CasiCompletos - CasiOpuesto
-    ).
+% es_casilla_del(+Turno, +Elemento)
+% Verdadero si el elemento es una celda reclamada por el jugador "Turno"
+es_casilla_del(Turno, c(_,_,Turno)).
 
-% contar_casilleros_casi_completos(+Tablero, +Jugador, -Cantidad)
-contar_casilleros_casi_completos(Tablero, Jugador, Cantidad) :-
-    length(Tablero, N),
-    N1 is N - 1,
-    findall(1, (between(1, N1, F), between(1, N1, C),
-                casillero_casi_completo(Tablero, F, C)), Lista),
-    length(Lista, Cantidad).
 
-% casillero_casi_completo(+Tablero, +F, +C)
-% Un casillero está casi completo si tiene 3 de sus 4 líneas marcadas
-casillero_casi_completo(Tablero, F, C) :-
-    obtener_celda(Tablero, F, C, c(H1, V1, 0)), % No capturado
-    F1 is F + 1,
-    C1 is C + 1,
-    obtener_celda(Tablero, F1, C, c(H2, _, _)),
-    obtener_celda(Tablero, F, C1, c(_, V2, _)),
-    Lineas = [H1, V1, H2, V2],
-    contar_ocurrencias(Lineas, 1, 3).
+% mejor_valor(+Turno,+ListaValores,?Valor)
+mejor_valor(1, Valores, Valor) :- max_list(Valores, Valor).
+mejor_valor(2, Valores, Valor) :- min_list(Valores, Valor).
 
-% obtener_celda(+Tablero, +F, +C, -Celda)
-obtener_celda(Tablero, F, C, Celda) :-
-    nth1(F, Tablero, Fila),
-    nth1(C, Fila, Celda).
-
-% contar_ocurrencias(+Lista, +Elemento, -Cantidad)
-contar_ocurrencias([], _, 0).
-contar_ocurrencias([X|Resto], X, N) :-
-    contar_ocurrencias(Resto, X, N1),
-    N is N1 + 1.
-contar_ocurrencias([Y|Resto], X, N) :-
-    X \= Y,
-    contar_ocurrencias(Resto, X, N).
+% mejor_entre(+[Jugada,Valor1], +[JugadaMejor,Valor2], -Mejor)
+mejor_entre([J1, V1], [], [J1, V1]).
+mejor_entre([J1, V1], [_, V2], [J1, V1]) :- V1 > V2.
+mejor_entre([_, V1], [J2, V2], [J2, V2]) :- V1 =< V2.
