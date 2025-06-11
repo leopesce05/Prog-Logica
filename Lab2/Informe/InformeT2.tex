@@ -116,7 +116,7 @@
 			El otro predicado auxiliar que usa esta función es el de \textit{contar\_puntos} que pasa celda por celda sumando en el contador del jugador correspondiente si está conquistada por él. Por ejemplo, si se tiene la celda $c(\_,\_,1)$, se suma un punto al jugador $1$. Para que esto funcione se debe verificar antes que el juego está terminado de forma que todas las aristas estén marcadas debido a que $c(1,0,1)$ no es una instancia válida de una casilla, así como tampoco lo es $c(0,1,1)$ ni $c(0,0,1)$ (en todas se usa como ejemplo el jugador $1$, pero si en lugar de $1$ fuera $2$ tampoco serían viables estas instancias).
 			
 		\subsection{Jugada humano}
-		En este predicado se realiza una jugada hecha por un humano al ingresar una fila, columna y dirección que corresponden a la arista de la celda que se desea marcar. La dirección indica cual de las 2 aristas marcar en la celda ($h$ para la superior, $v$ para la izquierda). Finalmente se devuelve el tablero actualizado con el movimiento y una lista de las celdas capturadas en caso de ocurrir una captura (notar que como máximo solo se podrán capturar 2 celdas en una misma jugada).
+		En este predicado se realiza una jugada hecha por un humano al ingresar una fila, columna y dirección que corresponden a la arista de la celda que se desea marcar. La dirección indica cual de las 2 aristas marcar en la celda ($h$ para la superior, $v$ para la izquierda). Finalmente se devuelve el tablero actualizado con el movimiento, de quién es el siguiente turno y una lista de las celdas capturadas en caso de ocurrir una captura (notar que como máximo solo se podrán capturar 2 celdas en una misma jugada).
 		
 			\subsubsection{Diseño de "Jugada humano"}
 			Para la función se realizan las siguientes actividades:
@@ -142,7 +142,47 @@
 			Este predicado simplemente verifica que la lista de celdas capturada esté vacío o no para saber a quien corresponde el siguiente turno, si está vacío al otro jugador, si tiene al menos una captura sigue jugando el mismo jugador que acaba de marcar la línea.
 			
 		\subsection{Jugada máquina}
+		En esta función se debe simular una jugada realizada por una IA con una estrategia \textit{buena y eficiente} la cual culmine antes de los 10 segundos para un tablero con $N=6$. Esta jugada debe dar la misma información que una jugada humana: un tablero actualizado con el movimiento realizado, de quién es el turno siguiente y una lista con las capturas realizadas por el movimiento en caso de haberlas.
 		
+			\subsubsection{Diseño de "Jugada máquina"}
+			Para implementar está función se hace una atrás de la otra las funciones 'Sugerencia jugada' y 'Jugada humano' de forma que se simula la jugada de un humano a partir del  movimiento sugerido.
 		
-	
+			\begin{figure}[h!]
+				\centering
+				\includegraphics[width=0.9\linewidth]{"jugadamaquina"}
+				\caption{Notar que los dos predicados utilizados son funciones principales, por lo que tienen una sección particular para cada una ('Sugerencia jugada' se explicará a continuación, mientras que 'Jugada humano' fue explicada en la sección anterior).}
+			\end{figure}
+		
+		\subsection{Sugerencia jugada}
+		Para esta función se solicita calcular una buena jugada para sugerirle a un jugador humano. Se sugiere utilizar la estrategia \textit{minimax} utilizada en el curso pero puede ser cualquier estrategia que el equipo elija, el único requisito es que para una tablero con $N=6$ el tiempo de respuesta sea menor a 10 segundos.
+		
+			\subsubsection{Diseño de "Sugerencia jugada"}
+			Para la implementación del predicado se utilizó la estrategia \textit{minimax} vista a lo largo del curso. Este algoritmo es una regla de decisión que busca minimizar la pérdida en el peor escenario posible mientras maximiza la mínima ganancia en el mejor.
+			
+			El valor \textbf{maximin} se calcula de la siguiente manera:
+			\begin{enumerate}
+				\item Se chequean todas las posibles acciones de los otros jugadores para cada acción del jugador.
+				\item Se determina la peor combinación posible de acciones, es decir, aquella que le da al jugador el menor valor.
+				\item Se determina cuál acción el jugador puede tomar de manera de asegurar que el mínimo valor es el más alto posible.
+			\end{enumerate}
+			
+			Definición formal:
+			\begin{figure}[h!]
+				\centering
+				\includegraphics[width=0.4\linewidth]{maximin}
+			\end{figure}
+			
+			
+			El valor \textbf{minimax} es el menor valor que los otros jugadores pueden forzar al jugador a recibir sin saber las acciones del jugador. Para calcularlo se invierte el orden de la maximización y la minimización, es decir, se minimiza el máximo mientras que en el anterior se maximizaba el mínimo. La definición formal es:\\
+			
+			\begin{figure}[h!]
+				\centering
+				\includegraphics[width=0.4\linewidth]{Imagenes/minimax}
+			\end{figure}
+			
+			En definitiva, como se trata de un juego de suma 0 (donde gana uno, gana otro o hay empate, es decir $+1$, $-1$ o 0 de acuerdo a la visión de cada jugador), se diseña una forma de jugar que reduce la ganancia del otro jugador al usar una jugada sugerida, pero también se reduce la ganancia propia por la naturaleza de suma 0 del juego. Dicho esto, se puede argumentar que el diseño de la estrategia es de un jugador defensivo y pasivo, que busca no perder ni arriesgar demasiado.
+		
+			\subsubsection{Predicados auxiliares}
+			Para este algoritmo se utilizan varios predicados auxiliares encargados de hacer lo explicado anteriormente. Se tiene \textit{evaluar\_jugadas} que, de acuerdo a los niveles buscados calcula el valor minimax a cada uno para poder determinar cual jugada minimiza la ganancia del otro jugador. Dentro de este predicado se tienen más auxiliares como \textit{valor\_minimax} que calcula el valor ya descrito, \textit{mejor\_entre} que devuelve cuál valor entre dos jugadas es mejor, y se llama al predicado recursivamente hasta que el nivel sea 0.
+		
 \end{document}
