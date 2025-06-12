@@ -397,19 +397,23 @@ determinar_siguiente_turno(Turno, [_|_], Turno).
  % sugerencia_jugada(+Tablero,+Turno,+Nivel,?F,?C,?D)
  sugerencia_jugada(Tablero, Turno, Nivel, F, C, D) :-
      length(Tablero, N),
-     N1 is N - 1,
-
+     
      findall([F1, C1, D1], (
          member(D1, [h, v]),
-         between(0, N1, F1),
-         between(0, N1, C1),
+         between(1, N, F1),
+         between(1, N, C1),
          jugada_valida(Tablero, F1, C1, D1)
      ), Jugadas),
-     evaluar_jugadas(Jugadas, Tablero, Turno, Nivel, [], [MejorF, MejorC, MejorD]),
-     F = MejorF, C = MejorC, D = MejorD.
+     (Jugadas = [] ->
+         fail  % No hay jugadas disponibles
+     ;
+         evaluar_jugadas(Jugadas, Tablero, Turno, Nivel, [], [MejorF, MejorC, MejorD]),
+         F = MejorF, C = MejorC, D = MejorD
+     ).
 
 % evaluar_jugadas(+Jugadas,+Tablero,+Turno,+Nivel,+MejorHastaAhora,?MejorJugada)
-evaluar_jugadas([], _, _, _, [Jugada, _], Jugada).
+evaluar_jugadas([], _, _, _, [Jugada, _], Jugada) :- !.
+evaluar_jugadas([[F,C,D]], Tablero, Turno, Nivel, [], [F,C,D]) :- !.
 evaluar_jugadas([[F,C,D]|Resto], Tablero, Turno, Nivel, MejorActual, MejorJugada) :-
     jugada_humano(Tablero, Turno, F, C, D, Tab1, Turno1, _),
     N1 is Nivel - 1,
@@ -428,17 +432,22 @@ valor_minimax(Tablero, Turno, Nivel, Valor) :-
     Nivel > 0,
     N1 is Nivel - 1,
     length(Tablero, N),
-    N2 is N - 1,
 
     findall(V, (
         member(D, [h, v]),
-        between(0, N2, F),
-        between(0, N2, C),
+        between(1, N, F),
+        between(1, N, C),
         jugada_valida(Tablero, F, C, D),
         jugada_humano(Tablero, Turno, F, C, D, Tab1, Turno1, Celdas),
-        (Celdas \= [] -> valor_minimax(Tab1, Turno, N1, V) ; 
-                         otro_turno(Turno, Turno1),
-                         valor_minimax(Tab1, Turno1, N1, V))
+        (Celdas \= [] -> 
+            % Si capturó celdas, sigue siendo su turno, pero negamos el valor porque es minimax
+            valor_minimax(Tab1, Turno1, N1, V1),
+            V is -V1
+        ; 
+            % Si no capturó celdas, cambió el turno, negamos el valor
+            valor_minimax(Tab1, Turno1, N1, V1),
+            V is -V1
+        )
     ), Valores),
     (Valores == [] -> 
         puntaje(Tablero, Turno, MiPuntaje),
@@ -468,5 +477,5 @@ mejor_valor(2, Valores, Valor) :- min_list(Valores, Valor).
 
 % mejor_entre(+[Jugada,Valor1], +[JugadaMejor,Valor2], -Mejor)
 mejor_entre([J1, V1], [], [J1, V1]).
-mejor_entre([J1, V1], [_, V2], [J1, V1]) :- V1 > V2.
+mejor_entre([J1, V1], [_, V2], [J1, V1]) :- V1 > V2, !.
 mejor_entre([_, V1], [J2, V2], [J2, V2]) :- V1 =< V2.
